@@ -21,7 +21,6 @@ public class NZXNServer {
 	public CommandLineRunner demo(NZXCompanyDataFetcher companyDataFetcher, NZXAnnouncementDataFetcher announcementDataFetcher) {
     	return (args) -> {
     		companyDataFetcher.update();
-    		announcementDataFetcher.update();
 		};
 	}
 }

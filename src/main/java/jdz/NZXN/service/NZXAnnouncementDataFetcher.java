@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,7 +24,6 @@ import jdz.NZXN.entity.announcement.Announcement;
 import jdz.NZXN.entity.announcement.AnnouncementRepository;
 import jdz.NZXN.entity.announcement.AnnouncementTypes;
 import jdz.NZXN.entity.company.Company;
-import jdz.NZXN.entity.company.CompanyRepository;
 
 @Component
 public class NZXAnnouncementDataFetcher {
@@ -37,9 +35,8 @@ public class NZXAnnouncementDataFetcher {
 	private final Logger log = LoggerFactory.getLogger(NZXAnnouncementDataFetcher.class);
 
 	@Autowired private AnnouncementRepository repository;
-	@Autowired private CompanyRepository companyRepository;
 
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 60000, initialDelay = 5000)
 	public void update() {
 		Announcement lastAnnouncement = repository.findTopByOrderByTimeDesc();
 		Calendar lastAnnouncementTime = lastAnnouncement == null ? Calendar.getInstance() : lastAnnouncement.getTime();
@@ -76,11 +73,10 @@ public class NZXAnnouncementDataFetcher {
 			if (announcement == null)
 				continue;
 
-			if (!announcement.getTime().after(time))
+			if (announcement.getTime().compareTo(time) <= 0)
 				return announcements;
 
 			announcements.add(announcement);
-			return announcements;
 		}
 
 		return announcements;
@@ -93,10 +89,7 @@ public class NZXAnnouncementDataFetcher {
 		String companyURL = tableRowElements.select("td[data-title=Company]").select("span").select("a").attr("href");
 		String companyId = companyURL.substring(companyURL.lastIndexOf("/") + 1);
 
-		Company company = new Company(companyId, "", companyURL);
-		Optional<Company> repoCompany = companyRepository.findById(companyId);
-		if (repoCompany.isPresent())
-			company = repoCompany.get();
+		Company company = new Company(companyId);
 
 		String typeText = tableRowElements.select("td[data-title=Type]").select("span").text();
 		AnnouncementTypes type = AnnouncementTypes.of(typeText);
