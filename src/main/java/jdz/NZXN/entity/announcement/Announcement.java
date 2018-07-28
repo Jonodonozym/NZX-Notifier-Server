@@ -33,8 +33,7 @@ public class Announcement {
 
 	@Getter private AnnouncementTypes type;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Getter private Calendar time;
+	@Temporal(TemporalType.TIMESTAMP) @Getter private Calendar time;
 
 	protected Announcement() {}
 

@@ -22,4 +22,8 @@ public class Company {
 	@Getter private String companyId;
 	@Getter private String name;
 	@Getter private String url;
+	
+	public Company(String id) {
+		this.companyId = id;
+	}
 }

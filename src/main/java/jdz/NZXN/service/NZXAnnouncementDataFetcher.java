@@ -80,6 +80,7 @@ public class NZXAnnouncementDataFetcher {
 				return announcements;
 
 			announcements.add(announcement);
+			return announcements;
 		}
 
 		return announcements;
