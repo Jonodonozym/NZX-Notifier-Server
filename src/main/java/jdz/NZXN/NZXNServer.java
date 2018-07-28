@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import jdz.NZXN.entity.company.CompanyRepository;
 import jdz.NZXN.service.NZXAnnouncementDataFetcher;
 import jdz.NZXN.service.NZXCompanyDataFetcher;
 
@@ -18,7 +19,7 @@ public class NZXNServer {
     }
     
     @Bean
-	public CommandLineRunner demo(NZXCompanyDataFetcher companyDataFetcher, NZXAnnouncementDataFetcher announcementDataFetcher) {
+	public CommandLineRunner demo(CompanyRepository companyRepo, NZXCompanyDataFetcher companyDataFetcher, NZXAnnouncementDataFetcher announcementDataFetcher) {
     	return (args) -> {
     		companyDataFetcher.update();
 		};
