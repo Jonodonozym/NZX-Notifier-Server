@@ -37,8 +37,11 @@ public class NZXAnnouncementDataFetcher {
 
 	@Scheduled(fixedRate = 60000)
 	public void update() {
-		Calendar lastAnnouncement = repository.findTopByOrderByTimeDesc().getTime();
-		List<Announcement> announcements = fetchAllAfter(lastAnnouncement);
+		Announcement lastAnnouncement = repository.findTopByOrderByTimeDesc();
+		Calendar lastAnnouncementTime = lastAnnouncement == null ? Calendar.getInstance() : lastAnnouncement.getTime();
+		if (lastAnnouncement == null)
+			lastAnnouncementTime.set(1990, 0, 0);
+		List<Announcement> announcements = fetchAllAfter(lastAnnouncementTime);
 		for (Announcement announcement : announcements)
 			repository.save(announcement);
 	}
