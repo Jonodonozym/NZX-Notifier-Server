@@ -26,7 +26,7 @@ import lombok.ToString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"user", "userId"})
 @EqualsAndHashCode(of = { "user" })
 public class UserConfig {
 	@Id @GeneratedValue

@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @Table(name = "users")
 @Entity
-@ToString
+@ToString(exclude = {"userConfig"})
 @EqualsAndHashCode(of = { "userId" })
 public class User {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
