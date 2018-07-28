@@ -1,0 +1,8 @@
+/bin/
+<<<<<<< HEAD
+/builds/
+=======
+/builds/
+>>>>>>> branch 'master' of https://github.com/Jonodonozym/NZX-Notifier.git
+/.gradle/
+/target/
