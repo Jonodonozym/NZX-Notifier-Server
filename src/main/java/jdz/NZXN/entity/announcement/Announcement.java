@@ -8,8 +8,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -18,7 +20,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Entity
-@ToString
+@ToString(exclude="time")
+@Table(indexes = @Index(name = "index_time", columnList="time", unique = false))
 public class Announcement {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Getter private Long announcementId;
