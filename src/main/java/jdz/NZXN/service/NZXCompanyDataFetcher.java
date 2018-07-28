@@ -11,6 +11,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,16 +26,26 @@ public class NZXCompanyDataFetcher {
 	private static final String companiesListURL = "https://www.nzx.com/markets/NZSX";
 	private static final String companiesTable = "table.instruments-table";
 
+	private final Logger log = LoggerFactory.getLogger(NZXCompanyDataFetcher.class);
+
 	@Autowired private CompanyRepository repository;
 
 	@Scheduled(cron = "0 30 9 * * MON")
-	public void updateAll() {
+	public void update() {
 		Set<Company> repoCompanies = new HashSet<Company>();
 		for (Company company : repository.findAll())
 			repoCompanies.add(company);
-		for (Company company : fetchAll())
-			if (!repoCompanies.contains(company))
-				repository.save(company);
+
+		List<Company> nzxCompanies = fetchAll();
+		nzxCompanies.removeIf((c) -> {
+			return repoCompanies.contains(c);
+		});
+
+		for (Company company : nzxCompanies)
+			repository.save(company);
+
+		if (!nzxCompanies.isEmpty())
+			log.info("Fetched " + nzxCompanies.size() + " new compan" + (nzxCompanies.size() > 1 ? "ies" : "y"));
 	}
 
 	private List<Company> fetchAll() {
@@ -71,7 +83,7 @@ public class NZXCompanyDataFetcher {
 		companyName = companyName.replaceAll("\\(NS\\)", "").trim();
 
 		String companyURL = NZXrootURL + companyCell.select("a").attr("href");
-		String companyID = companyURL.substring(companyURL.lastIndexOf("/")+1);
+		String companyID = companyURL.substring(companyURL.lastIndexOf("/") + 1);
 		return new Company(companyID, companyName, companyURL);
 	}
 }

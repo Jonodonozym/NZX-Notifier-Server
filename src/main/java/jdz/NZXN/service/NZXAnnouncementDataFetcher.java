@@ -15,6 +15,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,8 @@ public class NZXAnnouncementDataFetcher {
 	private static final String announcementsTable = "table.table-to-list.announcements-table";
 	private static DateFormat NZXTimeFormat = new SimpleDateFormat("d/M/yyyy, h:mm a");
 
+	private final Logger log = LoggerFactory.getLogger(NZXAnnouncementDataFetcher.class);
+
 	@Autowired private AnnouncementRepository repository;
 	@Autowired private CompanyRepository companyRepository;
 
@@ -44,6 +48,9 @@ public class NZXAnnouncementDataFetcher {
 		List<Announcement> announcements = fetchAllAfter(lastAnnouncementTime);
 		for (Announcement announcement : announcements)
 			repository.save(announcement);
+
+		if (!announcements.isEmpty())
+			log.info("Fetched " + announcements.size() + " new announcement" + (announcements.size() > 1 ? "s" : ""));
 	}
 
 	private List<Announcement> fetchAllAfter(Calendar time) {
@@ -130,5 +137,4 @@ public class NZXAnnouncementDataFetcher {
 		Elements attatchments = doc.select("div.panel.module.documents").select("ul").select("li");
 		return attatchments.first().select("a").attr("href");
 	}
-
 }
