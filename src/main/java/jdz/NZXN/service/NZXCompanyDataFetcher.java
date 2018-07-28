@@ -68,7 +68,7 @@ public class NZXCompanyDataFetcher {
 		String companyName = companyCell.text();
 		if (companyName.contains("Limited"))
 			companyName = companyName.substring(0, companyName.indexOf("Limited")) + "Ltd.";
-		companyName = companyName.replaceAll("(NS)", "").trim();
+		companyName = companyName.replaceAll("\\(NS\\)", "").trim();
 
 		String companyURL = NZXrootURL + companyCell.select("a").attr("href");
 		String companyID = companyURL.substring(companyURL.lastIndexOf("/")+1);
