@@ -1,8 +1,8 @@
 
 package jdz.NZXN.entity.user;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-import jdz.NZXN.entity.announcement.AnnouncementTypes;
+import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -37,14 +37,14 @@ public class UserConfig {
 	private User user;
 
 	@ElementCollection
-	@Getter private List<Company> companyBlacklist = new ArrayList<>();
+	@Getter private Set<Company> companyBlacklist = new HashSet<>();
 
     @ElementCollection
     @Enumerated(EnumType.ORDINAL)
-	@Getter private List<AnnouncementTypes> typeBlacklist = new ArrayList<>();
+	@Getter private Set<AnnouncementType> typeBlacklist = new HashSet<>();
     
     @ElementCollection
-	@Getter private List<String> keywordBlacklist = new ArrayList<>();
+	@Getter private Set<String> keywordBlacklist = new HashSet<>();
 
 	@Getter @Setter private boolean pushEnabled = true;
 

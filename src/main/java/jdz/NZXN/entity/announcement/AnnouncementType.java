@@ -1,15 +1,15 @@
 
 package jdz.NZXN.entity.announcement;
 
-public enum AnnouncementTypes {
+public enum AnnouncementType {
 	GENERAL, MEETING, SHINTR, MKTUPDTE, TRANSACT, ADMIN, SECISSUE, ANNREP, FLLYR, HLFYR, OTHER;
 	
-	public static AnnouncementTypes of(String string) {
+	public static AnnouncementType of(String string) {
 		try {
-			return AnnouncementTypes.valueOf(string.replaceAll("/", ""));
+			return AnnouncementType.valueOf(string.replaceAll("/", ""));
 		}
 		catch (Exception e) {
-			return AnnouncementTypes.OTHER;
+			return null;
 		}
 	}
 }

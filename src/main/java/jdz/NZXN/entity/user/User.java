@@ -20,26 +20,24 @@ import lombok.ToString;
 @ToString(exclude = {"userConfig"})
 @EqualsAndHashCode(of = { "userId" })
 public class User {
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Getter private Long userId;
+	
 	@Getter private String username;
 	@Getter @Setter private String password;
 	@Getter @Setter private String email;
-	@Getter @Setter private Long lastUpdate;
+	@Getter @Setter private Long lastFetchedAnnouncement = 0L;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
 	@Getter @Setter private UserConfig userConfig = new UserConfig();
 
 	protected User() {}
 
-	public User(String username, String password, String email) {
-		this(username, password, email, 0L);
-	}
-
-	public User(String username, String password, String email, Long lastUpdate) {
+	public User(String username, String password, String email, Long lastFetchedAnnouncement) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
-		this.lastUpdate = lastUpdate;
+		this.lastFetchedAnnouncement = lastFetchedAnnouncement;
 	}
 }

@@ -14,16 +14,16 @@ import lombok.ToString;
 @Table(name = "companies")
 @Entity
 @ToString
-@EqualsAndHashCode(of = {"companyId"})
+@EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class Company {
 	@Id
-	@Getter private String companyId;
+	@Getter private String id;
 	@Getter private String name;
 	@Getter private String url;
 	
 	public Company(String id) {
-		this.companyId = id;
+		this.id = id;
 	}
 }
