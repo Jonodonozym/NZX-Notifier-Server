@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 import jdz.NZXN.entity.announcement.Announcement;
 import jdz.NZXN.entity.announcement.AnnouncementRepository;
-import jdz.NZXN.entity.announcement.AnnouncementTypes;
+import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
 
 @Component
@@ -95,7 +95,9 @@ public class NZXAnnouncementDataFetcher {
 		Company company = new Company(companyId);
 
 		String typeText = tableRowElements.select("td[data-title=Type]").select("span").text();
-		AnnouncementTypes type = AnnouncementTypes.of(typeText);
+		AnnouncementType type = AnnouncementType.of(typeText);
+		if (type == null)
+			type = AnnouncementType.OTHER;
 
 		String title = tableRowElements.select("td[data-title=Title]").select("span").select("a").text()
 				.replaceAll("\\\\|/|:", "-").replaceAll("\"", "");

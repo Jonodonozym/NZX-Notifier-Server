@@ -32,9 +32,7 @@ public class NZXCompanyDataFetcher {
 
 	@Scheduled(cron = "0 30 9 * * MON")
 	public void update() {
-		Set<Company> repoCompanies = new HashSet<Company>();
-		for (Company company : repository.findAll())
-			repoCompanies.add(company);
+		Set<Company> repoCompanies = new HashSet<Company>(repository.findAll());
 
 		List<Company> nzxCompanies = fetchAll();
 		nzxCompanies.removeIf((c) -> {
