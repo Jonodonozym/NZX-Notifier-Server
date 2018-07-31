@@ -1,8 +1,8 @@
 
-package jdz.NZXN.entity.user;
+package jdz.NZXN.entity.userConfig;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserConfigRepository extends JpaRepository<UserConfig, Long> {
-    public UserConfig findByUserId(Long userId);
+    public UserConfig findByUsername(String username);
 }

@@ -1,5 +1,5 @@
 
-package jdz.NZXN.entity.user;
+package jdz.NZXN.entity.userConfig;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,14 +8,12 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 
 import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
+import jdz.NZXN.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,15 +24,11 @@ import lombok.ToString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"user", "userId"})
-@EqualsAndHashCode(of = { "user" })
+@ToString
+@EqualsAndHashCode(of = { "username" })
 public class UserConfig {
 	@Id @GeneratedValue
-	@Getter private Long userId;
-	
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "userId", nullable = false)
-	private User user;
+	@Getter private String username;
 
 	@ElementCollection
 	@Getter private Set<Company> companyBlacklist = new HashSet<>();
@@ -58,7 +52,6 @@ public class UserConfig {
 	@Getter @Setter private int quietHoursEndMinutes = 0;
 	
 	public UserConfig(User user) {
-		this.user = user;
-		this.userId = user.getUserId();
+		this.username = user.getUsername();
 	}
 }
