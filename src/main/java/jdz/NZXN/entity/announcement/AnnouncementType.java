@@ -2,7 +2,7 @@
 package jdz.NZXN.entity.announcement;
 
 public enum AnnouncementType {
-	GENERAL, MEETING, SHINTR, MKTUPDTE, TRANSACT, ADMIN, SECISSUE, ANNREP, FLLYR, HLFYR, OTHER;
+	GENERAL, MEETING, SHINTR, MKTUPDTE, TRANSACT, ADMIN, SECISSUE, ANNREP, FLLYR, HALFYR, OTHER;
 	
 	public static AnnouncementType of(String string) {
 		try {
