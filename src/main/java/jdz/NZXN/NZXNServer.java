@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import jdz.NZXN.NZXDataFetchers.NZXAnnouncementDataFetcher;
+import jdz.NZXN.NZXDataFetchers.NZXCompanyDataFetcher;
 import jdz.NZXN.entity.company.CompanyRepository;
-import jdz.NZXN.service.NZXAnnouncementDataFetcher;
-import jdz.NZXN.service.NZXCompanyDataFetcher;
 
 @SpringBootApplication
 @EnableScheduling
