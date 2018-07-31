@@ -1,5 +1,5 @@
 
-package jdz.NZXN.service;
+package jdz.NZXN.NZXDataFetchers;
 
 import java.io.IOException;
 import java.text.DateFormat;
