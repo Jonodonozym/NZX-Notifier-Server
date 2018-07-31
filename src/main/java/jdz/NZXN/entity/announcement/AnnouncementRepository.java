@@ -9,8 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import jdz.NZXN.entity.company.Company;
 
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
-	public Optional<Announcement> findById(Long id);
-	public List<Announcement> findByIdGreaterThanOrderByIdDesc(Long id);
+	public Announcement findFirstByOrderByIdDesc();
+	
+	public Optional<Announcement> findById(long id);
+	
+	public List<Announcement> findByIdGreaterThan(Long id);
+	public List<Announcement> findByIdBetween(long idStart, long idEnd);
 	
 	public List<Announcement> findFirst50ByCompany(Company company);
 	public List<Announcement> findFirst50ByType(AnnouncementType type);
