@@ -18,6 +18,7 @@ public class WebMVCController extends WebMvcConfigurationSupport {
 		registry.addViewController("/").setViewName("hello");
 		registry.addViewController("/hello").setViewName("hello");
 		registry.addViewController("/login").setViewName("login");
+		registry.addViewController("/register/success").setViewName("registerSuccess");
 	}
 	
 	@Override
