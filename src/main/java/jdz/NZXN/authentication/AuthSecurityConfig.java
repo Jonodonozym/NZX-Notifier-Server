@@ -1,5 +1,5 @@
 
-package jdz.NZXN.auth;
+package jdz.NZXN.authentication;
 
 import java.security.SecureRandom;
 import java.util.Locale;
@@ -17,19 +17,21 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class AuthSecurityConfig extends WebSecurityConfigurerAdapter {
 	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated()
             .and().formLogin().loginPage("/login").permitAll()
+            .and().authorizeRequests().antMatchers("/register").permitAll()
+            .and().httpBasic()
             .and().logout().permitAll();
     }
     
     @Bean
     @Override
     public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl();
+        return new NZXUserDetailsService();
     }
     
     @Bean

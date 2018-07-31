@@ -1,5 +1,5 @@
 
-package jdz.NZXN.auth;
+package jdz.NZXN.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,13 +14,13 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import jdz.NZXN.auth.accountLocker.LoginAttemptService;
+import jdz.NZXN.authentication.accountLocker.LoginAttemptService;
 import jdz.NZXN.entity.user.User;
 import jdz.NZXN.entity.user.UserRepository;
 
 @Service("userDetailsService")
 @Transactional
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class NZXUserDetailsService implements UserDetailsService {
 
 	@Autowired private UserRepository userRepository;
 	@Autowired private LoginAttemptService loginAttemptService;
@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired private PasswordEncoder passEncoder;
 
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException, VerifyError {
 		String ip = getRemoteAddress();
 		boolean blocked = ip == null ? false : loginAttemptService.isBlocked(ip);
 
@@ -37,6 +37,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			user = userRepository.findByUsername(email);
 		if (user == null)
 			throw new UsernameNotFoundException("Username Not Found");
+		if (!user.isVerified())
+			throw new VerifyError("User has not been verified! Please confirm account registration via email.");
 
 		return org.springframework.security.core.userdetails.User.builder().passwordEncoder(passEncoder::encode)
 				.username(user.getUsername()).password(user.getPassword()).accountLocked(blocked).roles("USER").build();
