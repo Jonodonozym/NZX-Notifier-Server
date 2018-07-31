@@ -18,8 +18,8 @@ import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
 import jdz.NZXN.entity.company.CompanyRepository;
 import jdz.NZXN.entity.user.User;
-import jdz.NZXN.entity.user.UserConfig;
 import jdz.NZXN.entity.user.UserRepository;
+import jdz.NZXN.entity.userConfig.UserConfig;
 
 @RestController
 @RequestMapping("/announcements")
@@ -29,10 +29,10 @@ public class AnnouncementFetchController {
 	@Autowired private CompanyRepository companyRepo;
 
 	@GetMapping("/new")
-	public Collection<Announcement> newAnnouncements(Principal principal) {
+	public Collection<Announcement> newAnnouncementsFiltered(Principal principal) {
 		User user = userRepo.findByUsername(principal.getName());
 		Long lastAnnouncement = user.getLastFetchedAnnouncement();
-		List<Announcement> announcements = repository.findByIdGreaterThanOrderByIdDesc(lastAnnouncement);
+		List<Announcement> announcements = repository.findByIdGreaterThan(lastAnnouncement);
 		if (!announcements.isEmpty()) {
 			user.setLastFetchedAnnouncement(announcements.get(0).getId());
 			userRepo.save(user);
@@ -43,13 +43,31 @@ public class AnnouncementFetchController {
 		return announcements;
 	}
 
+	@GetMapping("/recent")
+	public Collection<Announcement> recentAnnouncementsFiltered(Principal principal,
+			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
+		long topId = repository.findFirstByOrderByIdDesc().getId() - offset;
+		long endId = topId - 100;		
+
+		List<Announcement> announcements = repository.findByIdBetween(topId, endId);
+		
+		User user = userRepo.findByUsername(principal.getName());
+		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
+			user.setLastFetchedAnnouncement(topId);
+			userRepo.save(user);
+		}
+		
+		filter(principal, announcements);
+		return announcements;
+	}
+
 	@GetMapping("/search")
 	public Collection<Announcement> search(Principal principal, @RequestParam String query) {
 		List<Announcement> announcements = search(query);
 		filter(principal, announcements);
 		return announcements;
 	}
-	
+
 	private List<Announcement> search(String query) {
 		List<Company> companies = companyRepo.findByIdStartingWith(query);
 		if (companies.size() == 1)
@@ -65,10 +83,10 @@ public class AnnouncementFetchController {
 	private void filter(Principal principal, Collection<Announcement> announcements) {
 		if (announcements.isEmpty())
 			return;
-		
+
 		User user = userRepo.findByUsername(principal.getName());
 		UserConfig config = user.getUserConfig();
-		
+
 		Set<Company> cBlacklist = config.getCompanyBlacklist();
 		Set<String> kwBlacklist = config.getKeywordBlacklist();
 		Set<AnnouncementType> tBlacklist = config.getTypeBlacklist();
