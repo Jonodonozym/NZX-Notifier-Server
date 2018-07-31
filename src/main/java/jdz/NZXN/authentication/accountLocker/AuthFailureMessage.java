@@ -1,5 +1,5 @@
 
-package jdz.NZXN.auth.accountLocker;
+package jdz.NZXN.authentication.accountLocker;
 
 import java.io.IOException;
 import java.util.Locale;

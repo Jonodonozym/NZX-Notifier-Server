@@ -1,5 +1,5 @@
 
-package jdz.NZXN.auth.accountLocker;
+package jdz.NZXN.authentication.accountLocker;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

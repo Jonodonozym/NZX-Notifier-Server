@@ -1,5 +1,5 @@
 
-package jdz.NZXN.auth.accountLocker;
+package jdz.NZXN.authentication.accountLocker;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
