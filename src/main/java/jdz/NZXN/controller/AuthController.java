@@ -40,18 +40,18 @@ public class AuthController {
 		}
 	}
 
-	@GetMapping("/register")
-	public Device registerNewDevice(HttpServletRequest request) {
-		Device device = new Device(UUID.randomUUID(), UUID.randomUUID());
+	@GetMapping(path = "/register", consumes = "text/plain")
+	public Device registerNewDevice(@RequestBody String deviceName, HttpServletRequest request) {
+		Device device = new Device(UUID.randomUUID(), UUID.randomUUID(), deviceName);
 		while (deviceRepo.findByDeviceID(device.getDeviceID()) != null
 				|| !deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID()).isEmpty()) {
-			device = new Device(UUID.randomUUID(), UUID.randomUUID());
+			device = new Device(UUID.randomUUID(), UUID.randomUUID(), deviceName);
 		}
 		AccountConfig config = new AccountConfig(device);
-		
+
 		deviceRepo.save(device);
 		configRepo.save(config);
-		
+
 		return device;
 	}
 
