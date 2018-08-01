@@ -9,8 +9,9 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import org.hibernate.annotations.Type;
 
 import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
@@ -26,7 +27,8 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(of = { "accountID" })
 public class AccountConfig {
-	@Id @GeneratedValue
+	@Id
+	@Type(type="uuid-char")
 	@Setter @Getter private UUID accountID;
 
 	@ElementCollection
