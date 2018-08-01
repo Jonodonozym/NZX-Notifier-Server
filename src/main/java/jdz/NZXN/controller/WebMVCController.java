@@ -1,26 +1,17 @@
 
 package jdz.NZXN.controller;
 
+import java.util.UUID;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.support.FormattingConversionService;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import jdz.NZXN.entity.announcement.AnnouncementType;
 
 @Configuration
-public class WebMVCController extends WebMvcConfigurationSupport {
-	
-	@Override
-	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/home").setViewName("hello");
-		registry.addViewController("/").setViewName("hello");
-		registry.addViewController("/hello").setViewName("hello");
-		registry.addViewController("/login").setViewName("login");
-		registry.addViewController("/register/success").setViewName("registerSuccess");
-	}
-	
+public class WebMVCController extends WebMvcConfigurationSupport {	
 	@Override
 	public FormattingConversionService mvcConversionService() {
 		FormattingConversionService f = super.mvcConversionService();
@@ -28,6 +19,12 @@ public class WebMVCController extends WebMvcConfigurationSupport {
 			@Override
 			public AnnouncementType convert(String source) {
 				return AnnouncementType.of(source);
+			}
+		});
+		f.addConverter(new Converter<String, UUID>() {
+			@Override
+			public UUID convert(String source) {
+				return UUID.fromString(source);
 			}
 		});
 		return f;

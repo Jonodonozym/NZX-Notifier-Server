@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,30 +13,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jdz.NZXN.entity.accountConfig.AccountConfig;
+import jdz.NZXN.entity.accountConfig.AccountConfigRepository;
 import jdz.NZXN.entity.announcement.Announcement;
 import jdz.NZXN.entity.announcement.AnnouncementRepository;
 import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
 import jdz.NZXN.entity.company.CompanyRepository;
-import jdz.NZXN.entity.user.User;
-import jdz.NZXN.entity.user.UserRepository;
-import jdz.NZXN.entity.userConfig.UserConfig;
+import jdz.NZXN.entity.device.Device;
+import jdz.NZXN.entity.device.DeviceRepository;
 
 @RestController
 @RequestMapping("/announcements")
 public class AnnouncementFetchController {
-	@Autowired private AnnouncementRepository repository;
-	@Autowired private UserRepository userRepo;
+	@Autowired private AnnouncementRepository announcementRepo;
+	@Autowired private AccountConfigRepository configRepo;
+	@Autowired private DeviceRepository deviceRepo;
 	@Autowired private CompanyRepository companyRepo;
+	
+	private Device getDevice(Principal principal) {
+		Device device = deviceRepo.findByDeviceID(UUID.fromString(principal.getName()));
+		if (device == null)
+			throw new NullPointerException("No device exists with the ID "+principal.getName());
+		return device;
+	}
 
 	@GetMapping("/new")
 	public Collection<Announcement> newAnnouncementsFiltered(Principal principal) {
-		User user = userRepo.findByUsername(principal.getName());
+		Device user = getDevice(principal);
 		Long lastAnnouncement = user.getLastFetchedAnnouncement();
-		List<Announcement> announcements = repository.findByIdGreaterThan(lastAnnouncement);
+		List<Announcement> announcements = announcementRepo.findByIdGreaterThan(lastAnnouncement);
 		if (!announcements.isEmpty()) {
 			user.setLastFetchedAnnouncement(announcements.get(0).getId());
-			userRepo.save(user);
+			deviceRepo.save(user);
 		}
 
 		filter(principal, announcements);
@@ -46,15 +56,15 @@ public class AnnouncementFetchController {
 	@GetMapping("/recent")
 	public Collection<Announcement> recentAnnouncementsFiltered(Principal principal,
 			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
-		long topId = repository.findFirstByOrderByIdDesc().getId() - offset;
+		long topId = announcementRepo.findFirstByOrderByIdDesc().getId() - offset;
 		long endId = topId - 100;		
 
-		List<Announcement> announcements = repository.findByIdBetween(topId, endId);
+		List<Announcement> announcements = announcementRepo.findByIdBetween(topId, endId);
 		
-		User user = userRepo.findByUsername(principal.getName());
+		Device user = getDevice(principal);
 		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
 			user.setLastFetchedAnnouncement(topId);
-			userRepo.save(user);
+			deviceRepo.save(user);
 		}
 		
 		filter(principal, announcements);
@@ -71,21 +81,21 @@ public class AnnouncementFetchController {
 	private List<Announcement> search(String query) {
 		List<Company> companies = companyRepo.findByIdStartingWith(query);
 		if (companies.size() == 1)
-			return repository.findFirst50ByCompany(companies.get(0));
+			return announcementRepo.findFirst50ByCompany(companies.get(0));
 
 		AnnouncementType type = AnnouncementType.of(query);
 		if (type != null)
-			return repository.findFirst50ByType(type);
+			return announcementRepo.findFirst50ByType(type);
 
-		return repository.findFirst50ByTitleContaining(query);
+		return announcementRepo.findFirst50ByTitleContaining(query);
 	}
 
 	private void filter(Principal principal, Collection<Announcement> announcements) {
 		if (announcements.isEmpty())
 			return;
 
-		User user = userRepo.findByUsername(principal.getName());
-		UserConfig config = user.getUserConfig();
+		Device user = getDevice(principal);
+		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
 
 		Set<Company> cBlacklist = config.getCompanyBlacklist();
 		Set<String> kwBlacklist = config.getKeywordBlacklist();

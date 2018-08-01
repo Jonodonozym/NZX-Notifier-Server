@@ -22,7 +22,7 @@ public class CompaniesController {
 		return repo.findAll();
 	}
 	
-	@GetMapping
+	@GetMapping("/search")
 	public List<Company> search(@RequestParam String query){
 		return repo.findByIdStartingWith(query);
 	}

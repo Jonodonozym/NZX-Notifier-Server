@@ -2,7 +2,9 @@
 package jdz.NZXN.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,25 +12,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jdz.NZXN.entity.accountConfig.AccountConfig;
+import jdz.NZXN.entity.accountConfig.PushNotificationType;
+import jdz.NZXN.entity.accountConfig.AccountConfigRepository;
 import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
 import jdz.NZXN.entity.company.CompanyRepository;
-import jdz.NZXN.entity.user.UserRepository;
-import jdz.NZXN.entity.userConfig.PushNotificationType;
-import jdz.NZXN.entity.userConfig.UserConfig;
-import jdz.NZXN.entity.userConfig.UserConfigRepository;
+import jdz.NZXN.entity.device.Device;
+import jdz.NZXN.entity.device.DeviceRepository;
 import lombok.Data;
 
 @RestController
 @RequestMapping("/config")
-public class UserConfigController {
-	@Autowired private UserRepository userRepo;
-	@Autowired private UserConfigRepository configRepo;
+public class AccountConfigController {
+	@Autowired private DeviceRepository deviceRepo;
+	@Autowired private AccountConfigRepository configRepo;
 	@Autowired private CompanyRepository companyRepo;
 
 	@RequestMapping
-	public UserConfig getConfig(Principal principal) {
-		return userRepo.findByUsername(principal.getName()).getUserConfig();
+	public AccountConfig getConfig(Principal principal) {
+		return configRepo.findByAccountID(getDevice(principal).getAccountID());
+	}
+
+	private Device getDevice(Principal principal) {
+		Device device = deviceRepo.findByDeviceID(UUID.fromString(principal.getName()));
+		if (device == null)
+			throw new NullPointerException("No device exists with the ID " + principal.getName());
+		return device;
 	}
 
 	@PostMapping(path = "/blacklist/company/add", consumes = "text/plain")
@@ -77,7 +87,7 @@ public class UserConfigController {
 
 	@PostMapping(path = "/push")
 	public void updatePushConfig(Principal principal, @RequestBody PushConfigDTO dto) {
-		UserConfig config = getConfig(principal);
+		AccountConfig config = getConfig(principal);
 		config.setPushEnabled(dto.isEnabled());
 		config.setPushType(dto.getType());
 		configRepo.save(config);
@@ -91,7 +101,7 @@ public class UserConfigController {
 
 	@PostMapping(path = "/quietHours")
 	public void updateQuietHoursConfig(Principal principal, @RequestBody QuietHoursConfigDTO dto) {
-		UserConfig config = getConfig(principal);
+		AccountConfig config = getConfig(principal);
 		config.setQuietHoursEnabled(dto.isEnabled());
 		config.setQuietHoursStartMinutes(dto.getStartMinutes());
 		config.setQuietHoursEndMinutes(dto.getEndMinutes());
@@ -107,7 +117,7 @@ public class UserConfigController {
 
 	@PostMapping(path = "/alert")
 	public void updateAlertConfig(Principal principal, @RequestBody AlertConfigDTO dto) {
-		UserConfig config = getConfig(principal);
+		AccountConfig config = getConfig(principal);
 		config.setAlertFrequencyMinutes(dto.getFrequencyMinutes());
 		configRepo.save(config);
 	}
@@ -115,5 +125,34 @@ public class UserConfigController {
 	@Data
 	public static class AlertConfigDTO {
 		private int frequencyMinutes = 10;
+	}
+
+	@PostMapping(path = "/linkAccount", consumes = "text/plain")
+	public Device linkAccount(Principal principal, @RequestBody UUID accountID) {
+		Device device = getDevice(principal);
+		List<Device> devices = deviceRepo.findByAccountIDOrderByDeviceIDDesc(accountID);
+		if (devices.isEmpty())
+			return null;
+
+		AccountConfig config = getConfig(principal);
+		configRepo.delete(config);
+
+		device.setAccountID(accountID);
+		deviceRepo.save(device);
+		return device;
+	}
+
+	@PostMapping(path = "/unlinkAccount", consumes = "text/plain")
+	public Device unlinkAccount(Principal principal) {
+		Device device = getDevice(principal);
+		AccountConfig config = getConfig(principal);
+
+		while (!deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID()).isEmpty())
+			device.setAccountID(UUID.randomUUID());
+		config.setAccountID(device.getAccountID());
+
+		deviceRepo.save(device);
+		configRepo.save(config);
+		return device;
 	}
 }

@@ -1,5 +1,5 @@
 
-package jdz.NZXN.entity.userConfig;
+package jdz.NZXN.entity.accountConfig;
 
 public enum PushNotificationType {
 	SOUND, VIBRATE, SILENT;
