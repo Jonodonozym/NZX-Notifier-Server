@@ -1,5 +1,5 @@
 
-package jdz.NZXN.controller;
+package jdz.NZXN.config;
 
 import java.util.Locale;
 

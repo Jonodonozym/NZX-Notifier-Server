@@ -1,5 +1,5 @@
 
-package jdz.NZXN.controller;
+package jdz.NZXN.config;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import jdz.NZXN.entity.announcement.AnnouncementType;
 
 @Configuration
-public class WebMVCController extends WebMvcConfigurationSupport {	
+public class WebMVCConfig extends WebMvcConfigurationSupport {	
 	@Override
 	public FormattingConversionService mvcConversionService() {
 		FormattingConversionService f = super.mvcConversionService();
