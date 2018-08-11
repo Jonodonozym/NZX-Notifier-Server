@@ -30,7 +30,7 @@ public class Announcement {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Getter private Long id;
 
-	@ManyToOne(cascade=CascadeType.PERSIST)
+	@ManyToOne(cascade= CascadeType.MERGE)
 	@JoinColumn(name = "companyId", referencedColumnName = "Id")
 	@Getter private Company company;
 
