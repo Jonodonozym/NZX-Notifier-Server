@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.support.FormattingConversionService;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import jdz.NZXN.entity.announcement.AnnouncementType;
@@ -29,4 +30,9 @@ public class WebMVCConfig extends WebMvcConfigurationSupport {
 		});
 		return f;
 	}
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
+    }
 }
