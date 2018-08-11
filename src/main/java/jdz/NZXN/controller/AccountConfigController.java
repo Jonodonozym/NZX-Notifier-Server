@@ -2,7 +2,6 @@
 package jdz.NZXN.controller;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -125,34 +124,5 @@ public class AccountConfigController {
 	@Data
 	public static class AlertConfigDTO {
 		private int frequencyMinutes = 10;
-	}
-
-	@PostMapping(path = "/linkAccount", consumes = "text/plain")
-	public Device linkAccount(Principal principal, @RequestBody UUID accountID) {
-		Device device = getDevice(principal);
-		List<Device> devices = deviceRepo.findByAccountIDOrderByDeviceIDDesc(accountID);
-		if (devices.isEmpty())
-			return null;
-
-		AccountConfig config = getConfig(principal);
-		configRepo.delete(config);
-
-		device.setAccountID(accountID);
-		deviceRepo.save(device);
-		return device;
-	}
-
-	@PostMapping(path = "/unlinkAccount", consumes = "text/plain")
-	public Device unlinkAccount(Principal principal) {
-		Device device = getDevice(principal);
-		AccountConfig config = getConfig(principal);
-
-		while (!deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID()).isEmpty())
-			device.setAccountID(UUID.randomUUID());
-		config.setAccountID(device.getAccountID());
-
-		deviceRepo.save(device);
-		configRepo.save(config);
-		return device;
 	}
 }
