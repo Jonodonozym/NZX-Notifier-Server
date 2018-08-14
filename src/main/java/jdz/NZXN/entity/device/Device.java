@@ -4,8 +4,6 @@ package jdz.NZXN.entity.device;
 import java.util.UUID;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -24,7 +22,6 @@ public class Device {
 	@Setter @Getter private UUID accountID;
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
 	@Type(type="uuid-char")
 	@Getter private UUID deviceID;
 	

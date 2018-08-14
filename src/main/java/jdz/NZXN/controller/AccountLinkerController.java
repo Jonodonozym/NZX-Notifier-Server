@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,13 +40,13 @@ public class AccountLinkerController {
 	}
 	
 	@GetMapping(path = "/all")
-	public List<Device> getAll(Principal principal){
+	public List<Device> getAll(@AuthenticationPrincipal Principal principal){
 		Device device = getDevice(principal);
 		return deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID());
 	}
 
-	@PostMapping(path = "/join", consumes = "text/plain")
-	public Device linkAccount(Principal principal, @RequestBody UUID accountID) {
+	@PostMapping(path = "/join")
+	public Device linkAccount(@AuthenticationPrincipal Principal principal, @RequestBody UUID accountID) {
 		Device device = getDevice(principal);
 		List<Device> devices = deviceRepo.findByAccountIDOrderByDeviceIDDesc(accountID);
 		if (devices.isEmpty())
@@ -59,8 +60,8 @@ public class AccountLinkerController {
 		return device;
 	}
 
-	@PostMapping(path = "/unlink", consumes = "text/plain")
-	public Device unlinkAccount(Principal principal, @RequestBody UUID deviceID) {
+	@PostMapping(path = "/unlink")
+	public Device unlinkAccount(@AuthenticationPrincipal Principal principal, @RequestBody UUID deviceID) {
 		Device device = getDevice(deviceID);
 		AccountConfig config = getConfig(principal);
 

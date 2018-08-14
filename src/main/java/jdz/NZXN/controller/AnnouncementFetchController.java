@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +32,7 @@ public class AnnouncementFetchController {
 	@Autowired private DeviceRepository deviceRepo;
 	@Autowired private CompanyRepository companyRepo;
 	
-	private Device getDevice(Principal principal) {
+	private Device getDevice(@AuthenticationPrincipal Principal principal) {
 		Device device = deviceRepo.findByDeviceID(UUID.fromString(principal.getName()));
 		if (device == null)
 			throw new NullPointerException("No device exists with the ID "+principal.getName());
@@ -39,7 +40,7 @@ public class AnnouncementFetchController {
 	}
 
 	@GetMapping("/new")
-	public Collection<Announcement> newAnnouncementsFiltered(Principal principal) {
+	public Collection<Announcement> newAnnouncementsFiltered(@AuthenticationPrincipal Principal principal) {
 		Device user = getDevice(principal);
 		Long lastAnnouncement = user.getLastFetchedAnnouncement();
 		List<Announcement> announcements = announcementRepo.findByIdGreaterThan(lastAnnouncement);
@@ -54,25 +55,25 @@ public class AnnouncementFetchController {
 	}
 
 	@GetMapping("/recent")
-	public Collection<Announcement> recentAnnouncementsFiltered(Principal principal,
+	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
 			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
 		long topId = announcementRepo.findFirstByOrderByIdDesc().getId() - offset;
 		long endId = topId - 100;		
 
-		List<Announcement> announcements = announcementRepo.findByIdBetween(topId, endId);
+		List<Announcement> announcements = announcementRepo.findByIdBetween(endId, topId);
 		
 		Device user = getDevice(principal);
 		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
 			user.setLastFetchedAnnouncement(topId);
 			deviceRepo.save(user);
 		}
-		
+
 		filter(principal, announcements);
 		return announcements;
 	}
 
 	@GetMapping("/search")
-	public Collection<Announcement> search(Principal principal, @RequestParam String query) {
+	public Collection<Announcement> search(@AuthenticationPrincipal Principal principal, @RequestParam String query) {
 		List<Announcement> announcements = search(query);
 		filter(principal, announcements);
 		return announcements;

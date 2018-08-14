@@ -6,14 +6,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jdz.NZXN.entity.JSON;
 import jdz.NZXN.entity.accountConfig.AccountConfig;
-import jdz.NZXN.entity.accountConfig.PushNotificationType;
 import jdz.NZXN.entity.accountConfig.AccountConfigRepository;
+import jdz.NZXN.entity.accountConfig.PushNotificationType;
 import jdz.NZXN.entity.announcement.AnnouncementType;
 import jdz.NZXN.entity.company.Company;
 import jdz.NZXN.entity.company.CompanyRepository;
@@ -29,7 +31,7 @@ public class AccountConfigController {
 	@Autowired private CompanyRepository companyRepo;
 
 	@RequestMapping
-	public AccountConfig getConfig(Principal principal) {
+	public AccountConfig getConfig(@AuthenticationPrincipal Principal principal) {
 		return configRepo.findByAccountID(getDevice(principal).getAccountID());
 	}
 
@@ -40,8 +42,9 @@ public class AccountConfigController {
 		return device;
 	}
 
-	@PostMapping(path = "/blacklist/company/add", consumes = "text/plain")
-	public boolean blacklistAddCompany(Principal principal, @RequestBody String companyId) {
+	@PostMapping(path = "/blacklist/company/add")
+	public boolean blacklistAddCompany(@AuthenticationPrincipal Principal principal, @RequestBody String companyId) {
+		companyId = JSON.extractFirst(companyId);
 		Optional<Company> company = companyRepo.findById(companyId);
 		if (!company.isPresent())
 			return false;
@@ -49,8 +52,9 @@ public class AccountConfigController {
 		return getConfig(principal).getCompanyBlacklist().add(company.get());
 	}
 
-	@PostMapping(path = "/blacklist/company/remove", consumes = "text/plain")
-	public boolean blacklistRemoveCompany(Principal principal, @RequestBody String companyId) {
+	@PostMapping(path = "/blacklist/company/remove")
+	public boolean blacklistRemoveCompany(@AuthenticationPrincipal Principal principal, @RequestBody String companyId) {
+		companyId = JSON.extractFirst(companyId);
 		Optional<Company> company = companyRepo.findById(companyId);
 		if (!company.isPresent())
 			return false;
@@ -58,34 +62,34 @@ public class AccountConfigController {
 		return getConfig(principal).getCompanyBlacklist().remove(company.get());
 	}
 
-	@PostMapping(path = "/blacklist/type/add", consumes = "text/plain")
-	public boolean blacklistAddType(Principal principal, @RequestBody AnnouncementType type) {
+	@PostMapping(path = "/blacklist/type/add")
+	public boolean blacklistAddType(@AuthenticationPrincipal Principal principal, @RequestBody AnnouncementType type) {
 		if (type == null)
 			return false;
 
 		return getConfig(principal).getTypeBlacklist().add(type);
 	}
 
-	@PostMapping(path = "/blacklist/type/remove", consumes = "text/plain")
-	public boolean blacklistRemoveType(Principal principal, @RequestBody AnnouncementType type) {
+	@PostMapping(path = "/blacklist/type/remove")
+	public boolean blacklistRemoveType(@AuthenticationPrincipal Principal principal, @RequestBody AnnouncementType type) {
 		if (type == null)
 			return false;
 
 		return getConfig(principal).getTypeBlacklist().remove(type);
 	}
 
-	@PostMapping(path = "/blacklist/keyword/add", consumes = "text/plain")
-	public boolean blacklistAddKeyword(Principal principal, @RequestBody String keyword) {
-		return getConfig(principal).getKeywordBlacklist().add(keyword);
+	@PostMapping(path = "/blacklist/keyword/add")
+	public boolean blacklistAddKeyword(@AuthenticationPrincipal Principal principal, @RequestBody String keyword) {
+		return getConfig(principal).getKeywordBlacklist().add(JSON.extractFirst(keyword));
 	}
 
-	@PostMapping(path = "/blacklist/keyword/remove", consumes = "text/plain")
-	public boolean blacklistRemoveKeyword(Principal principal, @RequestBody String keyword) {
-		return getConfig(principal).getKeywordBlacklist().remove(keyword);
+	@PostMapping(path = "/blacklist/keyword/remove")
+	public boolean blacklistRemoveKeyword(@AuthenticationPrincipal Principal principal, @RequestBody String keyword) {
+		return getConfig(principal).getKeywordBlacklist().remove(JSON.extractFirst(keyword));
 	}
 
 	@PostMapping(path = "/push")
-	public void updatePushConfig(Principal principal, @RequestBody PushConfigDTO dto) {
+	public void updatePushConfig(@AuthenticationPrincipal Principal principal, @RequestBody PushConfigDTO dto) {
 		AccountConfig config = getConfig(principal);
 		config.setPushEnabled(dto.isEnabled());
 		config.setPushType(dto.getType());
@@ -99,7 +103,7 @@ public class AccountConfigController {
 	}
 
 	@PostMapping(path = "/quietHours")
-	public void updateQuietHoursConfig(Principal principal, @RequestBody QuietHoursConfigDTO dto) {
+	public void updateQuietHoursConfig(@AuthenticationPrincipal Principal principal, @RequestBody QuietHoursConfigDTO dto) {
 		AccountConfig config = getConfig(principal);
 		config.setQuietHoursEnabled(dto.isEnabled());
 		config.setQuietHoursStartMinutes(dto.getStartMinutes());
@@ -115,7 +119,7 @@ public class AccountConfigController {
 	}
 
 	@PostMapping(path = "/alert")
-	public void updateAlertConfig(Principal principal, @RequestBody AlertConfigDTO dto) {
+	public void updateAlertConfig(@AuthenticationPrincipal Principal principal, @RequestBody AlertConfigDTO dto) {
 		AccountConfig config = getConfig(principal);
 		config.setAlertFrequencyMinutes(dto.getFrequencyMinutes());
 		configRepo.save(config);
