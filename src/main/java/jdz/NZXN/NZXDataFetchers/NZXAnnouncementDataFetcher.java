@@ -126,10 +126,6 @@ public class NZXAnnouncementDataFetcher {
 	}
 
 	private String getPDFURL(String announcementURL) {
-		return announcementURL;
-		
-		/*
-		
 		Document doc;
 		try {
 			doc = Jsoup.connect(announcementURL).get();
@@ -139,6 +135,6 @@ public class NZXAnnouncementDataFetcher {
 		}
 
 		Elements attatchments = doc.select("div.panel.module.documents").select("ul").select("li");
-		return attatchments.first().select("a").attr("href");*/
+		return attatchments.first().select("a").attr("href");
 	}
 }
