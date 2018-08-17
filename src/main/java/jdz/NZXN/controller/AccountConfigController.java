@@ -63,7 +63,8 @@ public class AccountConfigController {
 	}
 
 	@PostMapping(path = "/blacklist/type/add")
-	public boolean blacklistAddType(@AuthenticationPrincipal Principal principal, @RequestBody AnnouncementType type) {
+	public boolean blacklistAddType(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
+		AnnouncementType type = AnnouncementType.valueOf(JSON.extractFirst(json));
 		if (type == null)
 			return false;
 
@@ -71,7 +72,8 @@ public class AccountConfigController {
 	}
 
 	@PostMapping(path = "/blacklist/type/remove")
-	public boolean blacklistRemoveType(@AuthenticationPrincipal Principal principal, @RequestBody AnnouncementType type) {
+	public boolean blacklistRemoveType(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
+		AnnouncementType type = AnnouncementType.valueOf(JSON.extractFirst(json));
 		if (type == null)
 			return false;
 

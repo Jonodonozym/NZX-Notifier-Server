@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jdz.NZXN.entity.JSON;
 import jdz.NZXN.entity.accountConfig.AccountConfig;
 import jdz.NZXN.entity.accountConfig.AccountConfigRepository;
 import jdz.NZXN.entity.device.Device;
@@ -46,22 +47,22 @@ public class AccountLinkerController {
 	}
 
 	@PostMapping(path = "/join")
-	public Device linkAccount(@AuthenticationPrincipal Principal principal, @RequestBody UUID accountID) {
+	public Device linkAccount(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
+		UUID deviceID = UUID.fromString(JSON.extractFirst(json));
 		Device device = getDevice(principal);
-		List<Device> devices = deviceRepo.findByAccountIDOrderByDeviceIDDesc(accountID);
-		if (devices.isEmpty())
-			return device;
+		Device desired = deviceRepo.findByDeviceID(deviceID);
 
 		AccountConfig config = getConfig(principal);
 		configRepo.delete(config);
 
-		device.setAccountID(accountID);
+		device.setAccountID(desired.getAccountID());
 		deviceRepo.save(device);
 		return device;
 	}
 
 	@PostMapping(path = "/unlink")
-	public Device unlinkAccount(@AuthenticationPrincipal Principal principal, @RequestBody UUID deviceID) {
+	public Device unlinkAccount(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
+		UUID deviceID = UUID.fromString(JSON.extractFirst(json));
 		Device device = getDevice(deviceID);
 		AccountConfig config = getConfig(principal);
 

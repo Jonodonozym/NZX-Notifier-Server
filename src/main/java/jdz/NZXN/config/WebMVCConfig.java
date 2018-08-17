@@ -21,13 +21,19 @@ public class WebMVCConfig extends WebMvcConfigurationSupport {
 		f.addConverter(new Converter<String, AnnouncementType>() {
 			@Override
 			public AnnouncementType convert(String source) {
+				System.out.println(source);
+				System.out.println(source);
+				System.out.println(source);
 				source = JSON.extractFirst(source);
 				return AnnouncementType.of(source);
 			}
 		});
 		f.addConverter(new Converter<String, UUID>() {
-			@Override
 			public UUID convert(String source) {
+				System.out.println(source);
+				System.out.println(source);
+				System.out.println(source);
+				System.out.println(source);
 				source = JSON.extractFirst(source);
 				return UUID.fromString(source);
 			}
