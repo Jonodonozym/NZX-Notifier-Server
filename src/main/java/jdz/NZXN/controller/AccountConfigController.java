@@ -43,51 +43,63 @@ public class AccountConfigController {
 	}
 
 	@PostMapping(path = "/blacklist/company/add")
-	public boolean blacklistAddCompany(@AuthenticationPrincipal Principal principal, @RequestBody String companyId) {
+	public void blacklistAddCompany(@AuthenticationPrincipal Principal principal, @RequestBody String companyId) {
 		companyId = JSON.extractFirst(companyId);
 		Optional<Company> company = companyRepo.findById(companyId);
 		if (!company.isPresent())
-			return false;
+			return;
 
-		return getConfig(principal).getCompanyBlacklist().add(company.get());
+		AccountConfig config = getConfig(principal);
+		config.getCompanyBlacklist().add(company.get());
+		configRepo.save(config);
 	}
 
 	@PostMapping(path = "/blacklist/company/remove")
-	public boolean blacklistRemoveCompany(@AuthenticationPrincipal Principal principal, @RequestBody String companyId) {
+	public void blacklistRemoveCompany(@AuthenticationPrincipal Principal principal, @RequestBody String companyId) {
 		companyId = JSON.extractFirst(companyId);
 		Optional<Company> company = companyRepo.findById(companyId);
 		if (!company.isPresent())
-			return false;
+			return;
 
-		return getConfig(principal).getCompanyBlacklist().remove(company.get());
+		AccountConfig config = getConfig(principal);
+		config.getCompanyBlacklist().remove(company.get());
+		configRepo.save(config);
 	}
 
 	@PostMapping(path = "/blacklist/type/add")
-	public boolean blacklistAddType(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
+	public void blacklistAddType(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
 		AnnouncementType type = AnnouncementType.valueOf(JSON.extractFirst(json));
 		if (type == null)
-			return false;
+			return;
 
-		return getConfig(principal).getTypeBlacklist().add(type);
+		AccountConfig config = getConfig(principal);
+		config.getTypeBlacklist().add(type);
+		configRepo.save(config);
 	}
 
 	@PostMapping(path = "/blacklist/type/remove")
-	public boolean blacklistRemoveType(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
+	public void blacklistRemoveType(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
 		AnnouncementType type = AnnouncementType.valueOf(JSON.extractFirst(json));
 		if (type == null)
-			return false;
+			return;
 
-		return getConfig(principal).getTypeBlacklist().remove(type);
+		AccountConfig config = getConfig(principal);
+		config.getTypeBlacklist().remove(type);
+		configRepo.save(config);
 	}
 
 	@PostMapping(path = "/blacklist/keyword/add")
-	public boolean blacklistAddKeyword(@AuthenticationPrincipal Principal principal, @RequestBody String keyword) {
-		return getConfig(principal).getKeywordBlacklist().add(JSON.extractFirst(keyword));
+	public void blacklistAddKeyword(@AuthenticationPrincipal Principal principal, @RequestBody String keyword) {
+		AccountConfig config = getConfig(principal);
+		config.getKeywordBlacklist().add(JSON.extractFirst(keyword));
+		configRepo.save(config);
 	}
 
 	@PostMapping(path = "/blacklist/keyword/remove")
-	public boolean blacklistRemoveKeyword(@AuthenticationPrincipal Principal principal, @RequestBody String keyword) {
-		return getConfig(principal).getKeywordBlacklist().remove(JSON.extractFirst(keyword));
+	public void blacklistRemoveKeyword(@AuthenticationPrincipal Principal principal, @RequestBody String keyword) {
+		AccountConfig config = getConfig(principal);
+		config.getKeywordBlacklist().remove(JSON.extractFirst(keyword));
+		configRepo.save(config);
 	}
 
 	@PostMapping(path = "/push")
