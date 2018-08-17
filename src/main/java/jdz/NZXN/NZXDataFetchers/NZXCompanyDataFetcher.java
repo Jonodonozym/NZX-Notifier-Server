@@ -70,6 +70,7 @@ public class NZXCompanyDataFetcher {
 		}
 		
 		companies.add(new Company("NZXR", "NZX Regulations", "https://www.nzx.com/regulation/NZXR/announcements"));
+		companies.add(new Company("NZXO", "NZX Operations", "https://www.nzx.com/regulation/NZXO/announcements"));
 		return companies;
 	}
 

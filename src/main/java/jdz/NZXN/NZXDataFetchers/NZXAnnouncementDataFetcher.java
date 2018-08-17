@@ -61,7 +61,6 @@ public class NZXAnnouncementDataFetcher {
 			return announcements;
 		}
 
-
 		Element table = doc.select(announcementsTable).select("tbody").get(0);
 
 		for (Element row : table.select("tr")) {
@@ -78,6 +77,8 @@ public class NZXAnnouncementDataFetcher {
 				break;
 
 			announcements.add(announcement);
+			
+			System.out.println("New announcement: "+announcement.getCompany().getId()+", "+announcement.getTitle());
 		}
 		
 		Collections.reverse(announcements);
@@ -125,6 +126,10 @@ public class NZXAnnouncementDataFetcher {
 	}
 
 	private String getPDFURL(String announcementURL) {
+		return announcementURL;
+		
+		/*
+		
 		Document doc;
 		try {
 			doc = Jsoup.connect(announcementURL).get();
@@ -134,6 +139,6 @@ public class NZXAnnouncementDataFetcher {
 		}
 
 		Elements attatchments = doc.select("div.panel.module.documents").select("ul").select("li");
-		return attatchments.first().select("a").attr("href");
+		return attatchments.first().select("a").attr("href");*/
 	}
 }
