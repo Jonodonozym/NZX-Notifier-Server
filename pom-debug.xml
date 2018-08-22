@@ -19,6 +19,44 @@
 		<spring.boot.mainclass>jdz.NZXN.NZXNServer</spring.boot.mainclass>
 	</properties>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<mainClass>${spring.boot.mainclass}</mainClass>
+							<outputDircetory>D:\Personal utilities\NZXN</outputDircetory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<copy
+									file="D:\User\git\NZX-Notifier-Server\target\${project.build.finalName}.jar"
+									todir="D:\Personal utilities\NZXN" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>spring-releases</id>
