@@ -26,9 +26,12 @@ import lombok.Data;
 @RestController
 @RequestMapping("/config")
 public class AccountConfigController {
-	@Autowired private DeviceRepository deviceRepo;
-	@Autowired private AccountConfigRepository configRepo;
-	@Autowired private CompanyRepository companyRepo;
+	@Autowired
+	private DeviceRepository deviceRepo;
+	@Autowired
+	private AccountConfigRepository configRepo;
+	@Autowired
+	private CompanyRepository companyRepo;
 
 	@RequestMapping
 	public AccountConfig getConfig(@AuthenticationPrincipal Principal principal) {
@@ -117,7 +120,8 @@ public class AccountConfigController {
 	}
 
 	@PostMapping(path = "/quietHours")
-	public void updateQuietHoursConfig(@AuthenticationPrincipal Principal principal, @RequestBody QuietHoursConfigDTO dto) {
+	public void updateQuietHoursConfig(@AuthenticationPrincipal Principal principal,
+			@RequestBody QuietHoursConfigDTO dto) {
 		AccountConfig config = getConfig(principal);
 		config.setQuietHoursEnabled(dto.isEnabled());
 		config.setQuietHoursStartMinutes(dto.getStartMinutes());

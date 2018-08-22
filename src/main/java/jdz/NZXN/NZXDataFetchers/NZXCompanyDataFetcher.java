@@ -28,7 +28,8 @@ public class NZXCompanyDataFetcher {
 
 	private final Logger log = LoggerFactory.getLogger(NZXCompanyDataFetcher.class);
 
-	@Autowired private CompanyRepository repository;
+	@Autowired
+	private CompanyRepository repository;
 
 	@Scheduled(cron = "0 30 9 * * MON")
 	public void update() {
@@ -68,7 +69,7 @@ public class NZXCompanyDataFetcher {
 			if (company != null)
 				companies.add(company);
 		}
-		
+
 		companies.add(new Company("NZXR", "NZX Regulations", "https://www.nzx.com/regulation/NZXR/announcements"));
 		companies.add(new Company("NZXO", "NZX Operations", "https://www.nzx.com/regulation/NZXO/announcements"));
 		return companies;

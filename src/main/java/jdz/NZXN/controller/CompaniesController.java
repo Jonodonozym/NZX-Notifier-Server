@@ -15,15 +15,16 @@ import jdz.NZXN.entity.company.CompanyRepository;
 @RestController
 @RequestMapping("/companies")
 public class CompaniesController {
-	@Autowired private CompanyRepository repo;
-	
+	@Autowired
+	private CompanyRepository repo;
+
 	@GetMapping
 	public List<Company> fetchAll() {
 		return repo.findAll();
 	}
-	
+
 	@GetMapping("/search")
-	public List<Company> search(@RequestParam String query){
+	public List<Company> search(@RequestParam String query) {
 		return repo.findByIdStartingWith(query);
 	}
 }

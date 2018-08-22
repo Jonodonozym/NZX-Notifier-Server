@@ -27,6 +27,7 @@ public class WebMVCConfig extends WebMvcConfigurationSupport {
 			}
 		});
 		f.addConverter(new Converter<String, UUID>() {
+			@Override
 			public UUID convert(String source) {
 				source = JSON.extractFirst(source);
 				return UUID.fromString(source);
@@ -34,9 +35,9 @@ public class WebMVCConfig extends WebMvcConfigurationSupport {
 		});
 		return f;
 	}
-	
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**");
-    }
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**");
+	}
 }

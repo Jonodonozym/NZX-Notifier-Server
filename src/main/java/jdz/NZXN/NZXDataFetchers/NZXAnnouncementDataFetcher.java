@@ -35,7 +35,8 @@ public class NZXAnnouncementDataFetcher {
 
 	private final Logger log = LoggerFactory.getLogger(NZXAnnouncementDataFetcher.class);
 
-	@Autowired private AnnouncementRepository repository;
+	@Autowired
+	private AnnouncementRepository repository;
 
 	@Scheduled(fixedRate = 60000, initialDelay = 5000)
 	public void update() {
@@ -77,10 +78,11 @@ public class NZXAnnouncementDataFetcher {
 				break;
 
 			announcements.add(announcement);
-			
-			System.out.println("New announcement: "+announcement.getCompany().getId()+", "+announcement.getTitle());
+
+			System.out
+					.println("New announcement: " + announcement.getCompany().getId() + ", " + announcement.getTitle());
 		}
-		
+
 		Collections.reverse(announcements);
 
 		return announcements;

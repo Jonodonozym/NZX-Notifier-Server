@@ -16,7 +16,8 @@ import jdz.NZXN.entity.device.DeviceRepository;
 
 @Service
 public class DeviceDetailsService implements UserDetailsService {
-	@Autowired private DeviceRepository repo;
+	@Autowired
+	private DeviceRepository repo;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

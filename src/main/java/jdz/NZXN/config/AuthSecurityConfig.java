@@ -26,34 +26,35 @@ import com.google.common.collect.ImmutableList;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class AuthSecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired private AuthenticationEntryPoint authEntryPoint;
-	@Autowired private DeviceDetailsService detailsService;
-	
+	@Autowired
+	private AuthenticationEntryPoint authEntryPoint;
+	@Autowired
+	private DeviceDetailsService detailsService;
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-			.httpBasic().authenticationEntryPoint(authEntryPoint)
-			.and().authorizeRequests().antMatchers("/auth/**").permitAll()
-			.anyRequest().authenticated();
-		http.cors();
+		http.csrf().disable().httpBasic().authenticationEntryPoint(authEntryPoint).and().authorizeRequests()
+				.antMatchers("/auth/**").permitAll().anyRequest().authenticated();
+		http.cors().disable();
 	}
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(detailsService).passwordEncoder(new PasswordEncoder() {
-			
+
 			@Override
 			public boolean matches(CharSequence rawPassword, String encodedPassword) {
 				return rawPassword.equals(encodedPassword);
 			}
-			
+
 			@Override
 			public String encode(CharSequence rawPassword) {
 				return rawPassword.toString();
 			}
 		});
 	}
-	
+
+	@Override
 	@Bean
 	public AuthenticationManager authenticationManager() throws Exception {
 		return super.authenticationManager();
@@ -69,17 +70,17 @@ public class AuthSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
-		
+
 		configuration.setAllowedOrigins(ImmutableList.of("*"));
 		configuration.setAllowedMethods(ImmutableList.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
-		
-		
+
+
 		// setAllowCredentials(true) is important, otherwise:
 		// The value of the 'Access-Control-Allow-Origin' header in the response must
 		// not be the wildcard '*' when the request's credentials mode is 'include'.
 		configuration.setAllowCredentials(true);
-		
-		
+
+
 		// setAllowedHeaders is important! Without it, OPTIONS preflight request
 		// will fail with 403 Invalid CORS request
 		configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type"));

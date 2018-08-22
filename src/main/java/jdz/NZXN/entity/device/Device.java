@@ -13,21 +13,30 @@ import org.hibernate.annotations.Type;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Table(name = "devices", indexes = @Index(columnList = "accountID"))
 @Entity
 @EqualsAndHashCode(of = { "deviceID" })
+@ToString
 public class Device {
-	@Type(type="uuid-char")
-	@Setter @Getter private UUID accountID;
-	
+	@Type(type = "uuid-char")
+	@Setter
+	@Getter
+	private UUID accountID;
+
 	@Id
-	@Type(type="uuid-char")
-	@Getter private UUID deviceID;
-	
-	@Getter @Setter private String name;
-	
-	@Getter @Setter private Long lastFetchedAnnouncement = 0L;
+	@Type(type = "uuid-char")
+	@Getter
+	private UUID deviceID;
+
+	@Getter
+	@Setter
+	private String name;
+
+	@Getter
+	@Setter
+	private Long lastFetchedAnnouncement = 0L;
 
 	protected Device() {}
 

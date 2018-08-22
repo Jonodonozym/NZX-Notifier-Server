@@ -28,9 +28,12 @@ import jdz.NZXN.entity.device.DeviceRepository;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-	@Autowired private DeviceRepository deviceRepo;
-	@Autowired private AccountConfigRepository configRepo;
-	@Autowired private AuthenticationManager authenticationManager;
+	@Autowired
+	private DeviceRepository deviceRepo;
+	@Autowired
+	private AccountConfigRepository configRepo;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
 	@PostMapping(path = "/signin")
 	public boolean signin(HttpServletRequest req, @RequestBody String uuid) {
@@ -45,8 +48,8 @@ public class AuthController {
 			SecurityContext sc = SecurityContextHolder.getContext();
 			sc.setAuthentication(authentication);
 
-		    HttpSession session = req.getSession(true);
-		    session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
+			HttpSession session = req.getSession(true);
+			session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 			return true;
 		}
 		catch (BadCredentialsException e) {

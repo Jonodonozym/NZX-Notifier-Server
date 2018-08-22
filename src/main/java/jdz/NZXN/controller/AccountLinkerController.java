@@ -22,8 +22,10 @@ import jdz.NZXN.entity.device.DeviceRepository;
 @RestController
 @RequestMapping("/devicelink")
 public class AccountLinkerController {
-	@Autowired private DeviceRepository deviceRepo;
-	@Autowired private AccountConfigRepository configRepo;
+	@Autowired
+	private DeviceRepository deviceRepo;
+	@Autowired
+	private AccountConfigRepository configRepo;
 
 	public AccountConfig getConfig(Principal principal) {
 		return configRepo.findByAccountID(getDevice(principal).getAccountID());
@@ -39,11 +41,13 @@ public class AccountLinkerController {
 			throw new NullPointerException("No device exists with the ID " + uuid);
 		return device;
 	}
-	
-	@GetMapping(path = "/all")
-	public List<Device> getAll(@AuthenticationPrincipal Principal principal){
+
+	@GetMapping(path = "/linked")
+	public List<Device> getAll(@AuthenticationPrincipal Principal principal) {
 		Device device = getDevice(principal);
-		return deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID());
+		List<Device> devices = deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID());
+		devices.remove(device);
+		return devices;
 	}
 
 	@PostMapping(path = "/join")
@@ -64,15 +68,15 @@ public class AccountLinkerController {
 	public Device unlinkAccount(@AuthenticationPrincipal Principal principal, @RequestBody String json) {
 		UUID deviceID = UUID.fromString(JSON.extractFirst(json));
 		Device device = getDevice(deviceID);
-		AccountConfig config = getConfig(principal);
 
 		while (!deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID()).isEmpty())
 			device.setAccountID(UUID.randomUUID());
-		config.setAccountID(device.getAccountID());
 
-		deviceRepo.save(device);
+		AccountConfig config = new AccountConfig(device);
+
 		configRepo.save(config);
+		deviceRepo.save(device);
 		return device;
 	}
-	
+
 }

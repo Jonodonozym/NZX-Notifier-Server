@@ -9,12 +9,12 @@ import org.springframework.core.io.FileSystemResource;
 @Configuration
 public class NZXNServerContext {
 
-  @Bean
-  public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-    PropertySourcesPlaceholderConfigurer properties = new PropertySourcesPlaceholderConfigurer();
-    properties.setLocation(new FileSystemResource("application.properties"));
-    properties.setIgnoreResourceNotFound(false);
+	@Bean
+	public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+		PropertySourcesPlaceholderConfigurer properties = new PropertySourcesPlaceholderConfigurer();
+		properties.setLocation(new FileSystemResource("application.properties"));
+		properties.setIgnoreResourceNotFound(false);
 
-    return properties;
-  }
+		return properties;
+	}
 }
