@@ -1,1 +1,1 @@
-web: java -jar target/dependency/webapp-runner.jar --port $PORT target/*.jar --debug
+web: java -jar target/dependency/webapp-runner.jar --port $PORT target/*.jar
