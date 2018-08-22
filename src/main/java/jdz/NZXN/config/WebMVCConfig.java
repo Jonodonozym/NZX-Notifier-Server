@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.support.FormattingConversionService;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -21,23 +22,21 @@ public class WebMVCConfig extends WebMvcConfigurationSupport {
 		f.addConverter(new Converter<String, AnnouncementType>() {
 			@Override
 			public AnnouncementType convert(String source) {
-				System.out.println(source);
-				System.out.println(source);
-				System.out.println(source);
 				source = JSON.extractFirst(source);
 				return AnnouncementType.of(source);
 			}
 		});
 		f.addConverter(new Converter<String, UUID>() {
 			public UUID convert(String source) {
-				System.out.println(source);
-				System.out.println(source);
-				System.out.println(source);
-				System.out.println(source);
 				source = JSON.extractFirst(source);
 				return UUID.fromString(source);
 			}
 		});
 		return f;
 	}
+	
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
+    }
 }
