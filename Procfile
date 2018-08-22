@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar target/dependency/webapp-runner.jar --port $PORT target/*.jar
+web: java -Dserver.port=$PORT -jar  target/NZXNServer-0.1.0.jar 
