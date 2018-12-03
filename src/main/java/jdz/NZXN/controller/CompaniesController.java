@@ -15,8 +15,7 @@ import jdz.NZXN.entity.company.CompanyRepository;
 @RestController
 @RequestMapping("/companies")
 public class CompaniesController {
-	@Autowired
-	private CompanyRepository repo;
+	@Autowired private CompanyRepository repo;
 
 	@GetMapping
 	public List<Company> fetchAll() {

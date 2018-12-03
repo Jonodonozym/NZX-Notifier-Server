@@ -28,12 +28,9 @@ import jdz.NZXN.entity.device.DeviceRepository;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-	@Autowired
-	private DeviceRepository deviceRepo;
-	@Autowired
-	private AccountConfigRepository configRepo;
-	@Autowired
-	private AuthenticationManager authenticationManager;
+	@Autowired private DeviceRepository deviceRepo;
+	@Autowired private AccountConfigRepository configRepo;
+	@Autowired private AuthenticationManager authenticationManager;
 
 	@PostMapping(path = "/signin")
 	public boolean signin(HttpServletRequest req, @RequestBody String uuid) {
@@ -63,9 +60,8 @@ public class AuthController {
 		deviceName = JSON.extractFirst(deviceName);
 		Device device = new Device(UUID.randomUUID(), UUID.randomUUID(), deviceName);
 		while (deviceRepo.findByDeviceID(device.getDeviceID()) != null
-				|| !deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID()).isEmpty()) {
+				|| !deviceRepo.findByAccountIDOrderByDeviceIDDesc(device.getAccountID()).isEmpty())
 			device = new Device(UUID.randomUUID(), UUID.randomUUID(), deviceName);
-		}
 		AccountConfig config = new AccountConfig(device);
 
 		deviceRepo.save(device);

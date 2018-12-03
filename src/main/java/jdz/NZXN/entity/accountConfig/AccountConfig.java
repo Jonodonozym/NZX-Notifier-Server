@@ -27,49 +27,25 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(of = { "accountID" })
 public class AccountConfig {
-	@Id
-	@Type(type = "uuid-char")
-	@Setter
-	@Getter
-	private UUID accountID;
+	@Id @Type(type = "uuid-char") @Setter @Getter private UUID accountID;
 
-	@ElementCollection
-	@Getter
-	private Set<Company> companyBlacklist = new HashSet<>();
+	@ElementCollection @Getter private Set<Company> companyBlacklist = new HashSet<>();
 
-	@ElementCollection
-	@Enumerated(EnumType.ORDINAL)
-	@Getter
-	private Set<AnnouncementType> typeBlacklist = new HashSet<>();
+	@ElementCollection @Enumerated(EnumType.ORDINAL) @Getter private Set<AnnouncementType> typeBlacklist = new HashSet<>();
 
-	@ElementCollection
-	@Getter
-	private Set<String> keywordBlacklist = new HashSet<>();
+	@ElementCollection @Getter private Set<String> keywordBlacklist = new HashSet<>();
 
-	@Getter
-	@Setter
-	private boolean pushEnabled = true;
+	@Getter @Setter private boolean pushEnabled = true;
 
-	@Enumerated(EnumType.ORDINAL)
-	@Getter
-	@Setter
-	private PushNotificationType pushType = PushNotificationType.VIBRATE;
+	@Enumerated(EnumType.ORDINAL) @Getter @Setter private PushNotificationType pushType = PushNotificationType.VIBRATE;
 
-	@Getter
-	@Setter
-	private int alertFrequencyMinutes = 10;
+	@Getter @Setter private int alertFrequencyMinutes = 10;
 
-	@Getter
-	@Setter
-	private boolean quietHoursEnabled = false;
-	@Getter
-	@Setter
-	private int quietHoursStartMinutes = 0;
-	@Getter
-	@Setter
-	private int quietHoursEndMinutes = 0;
+	@Getter @Setter private boolean quietHoursEnabled = false;
+	@Getter @Setter private int quietHoursStartMinutes = 0;
+	@Getter @Setter private int quietHoursEndMinutes = 0;
 
 	public AccountConfig(Device user) {
-		this.accountID = user.getAccountID();
+		accountID = user.getAccountID();
 	}
 }

@@ -28,12 +28,11 @@ public class NZXCompanyDataFetcher {
 
 	private final Logger log = LoggerFactory.getLogger(NZXCompanyDataFetcher.class);
 
-	@Autowired
-	private CompanyRepository repository;
+	@Autowired private CompanyRepository repository;
 
 	@Scheduled(cron = "0 30 9 * * MON")
 	public void update() {
-		Set<Company> repoCompanies = new HashSet<Company>(repository.findAll());
+		Set<Company> repoCompanies = new HashSet<>(repository.findAll());
 
 		List<Company> nzxCompanies = fetchAll();
 		nzxCompanies.removeIf((c) -> {
@@ -48,7 +47,7 @@ public class NZXCompanyDataFetcher {
 	}
 
 	private List<Company> fetchAll() {
-		List<Company> companies = new ArrayList<Company>();
+		List<Company> companies = new ArrayList<>();
 		Document doc;
 		try {
 			doc = Jsoup.connect(companiesListURL).get();

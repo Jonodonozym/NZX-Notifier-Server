@@ -18,13 +18,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Company {
-	@Id
-	@Getter
-	private String id;
-	@Getter
-	private String name;
-	@Getter
-	private String url;
+	@Id @Getter private String id;
+	@Getter private String name;
+	@Getter private String url;
 
 	public Company(String id) {
 		this.id = id;

@@ -35,8 +35,7 @@ public class NZXAnnouncementDataFetcher {
 
 	private final Logger log = LoggerFactory.getLogger(NZXAnnouncementDataFetcher.class);
 
-	@Autowired
-	private AnnouncementRepository repository;
+	@Autowired private AnnouncementRepository repository;
 
 	@Scheduled(fixedRate = 60000, initialDelay = 5000)
 	public void update() {
@@ -53,7 +52,7 @@ public class NZXAnnouncementDataFetcher {
 	}
 
 	private List<Announcement> fetchAllAfter(Calendar time) {
-		List<Announcement> announcements = new ArrayList<Announcement>();
+		List<Announcement> announcements = new ArrayList<>();
 		Document doc;
 		try {
 			doc = Jsoup.connect(NZXannouncementsURL).get();

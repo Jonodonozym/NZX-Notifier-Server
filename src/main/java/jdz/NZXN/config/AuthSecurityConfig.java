@@ -27,18 +27,14 @@ import com.google.common.collect.ImmutableList;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class AuthSecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired
-	private AuthenticationEntryPoint authEntryPoint;
-	@Autowired
-	private DeviceDetailsService detailsService;
+	@Autowired private AuthenticationEntryPoint authEntryPoint;
+	@Autowired private DeviceDetailsService detailsService;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-			.httpBasic().authenticationEntryPoint(authEntryPoint)
-			.and().authorizeRequests()
-				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.antMatchers("/auth/**").permitAll().anyRequest().authenticated();
+		http.csrf().disable().httpBasic().authenticationEntryPoint(authEntryPoint).and().authorizeRequests()
+				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll().antMatchers("/auth/**").permitAll().anyRequest()
+				.authenticated();
 		http.cors();
 	}
 

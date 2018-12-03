@@ -20,28 +20,18 @@ import lombok.ToString;
 @EqualsAndHashCode(of = { "deviceID" })
 @ToString
 public class Device {
-	@Type(type = "uuid-char")
-	@Setter
-	@Getter
-	private UUID accountID;
+	@Type(type = "uuid-char") @Setter @Getter private UUID accountID;
 
-	@Id
-	@Type(type = "uuid-char")
-	@Getter
-	private UUID deviceID;
+	@Id @Type(type = "uuid-char") @Getter private UUID deviceID;
 
-	@Getter
-	@Setter
-	private String name;
+	@Getter @Setter private String name;
 
-	@Getter
-	@Setter
-	private Long lastFetchedAnnouncement = 0L;
+	@Getter @Setter private Long lastFetchedAnnouncement = 0L;
 
 	protected Device() {}
 
 	public Device(UUID accountId, UUID deviceID, String name) {
-		this.accountID = accountId;
+		accountID = accountId;
 		this.deviceID = deviceID;
 		this.name = name;
 	}

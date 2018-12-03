@@ -26,12 +26,9 @@ import lombok.Data;
 @RestController
 @RequestMapping("/config")
 public class AccountConfigController {
-	@Autowired
-	private DeviceRepository deviceRepo;
-	@Autowired
-	private AccountConfigRepository configRepo;
-	@Autowired
-	private CompanyRepository companyRepo;
+	@Autowired private DeviceRepository deviceRepo;
+	@Autowired private AccountConfigRepository configRepo;
+	@Autowired private CompanyRepository companyRepo;
 
 	@RequestMapping
 	public AccountConfig getConfig(@AuthenticationPrincipal Principal principal) {

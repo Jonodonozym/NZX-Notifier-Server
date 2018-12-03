@@ -22,10 +22,8 @@ import jdz.NZXN.entity.device.DeviceRepository;
 @RestController
 @RequestMapping("/devicelink")
 public class AccountLinkerController {
-	@Autowired
-	private DeviceRepository deviceRepo;
-	@Autowired
-	private AccountConfigRepository configRepo;
+	@Autowired private DeviceRepository deviceRepo;
+	@Autowired private AccountConfigRepository configRepo;
 
 	public AccountConfig getConfig(Principal principal) {
 		return configRepo.findByAccountID(getDevice(principal).getAccountID());

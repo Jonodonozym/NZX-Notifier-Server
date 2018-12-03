@@ -25,29 +25,17 @@ import lombok.ToString;
 		@Index(name = "index_company", columnList = "companyId", unique = false),
 		@Index(name = "index_type", columnList = "type", unique = false) })
 public class Announcement {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Getter
-	private Long id;
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Getter private Long id;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(name = "companyId", referencedColumnName = "Id")
-	@Getter
-	private Company company;
+	@ManyToOne(cascade = CascadeType.MERGE) @JoinColumn(name = "companyId", referencedColumnName = "Id") @Getter private Company company;
 
-	@Getter
-	private String title;
-	@Getter
-	private String url;
-	@Getter
-	private String pdfUrl;
+	@Getter private String title;
+	@Getter private String url;
+	@Getter private String pdfUrl;
 
-	@Getter
-	private AnnouncementType type;
+	@Getter private AnnouncementType type;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Getter
-	private Calendar time;
+	@Temporal(TemporalType.TIMESTAMP) @Getter private Calendar time;
 
 	protected Announcement() {}
 

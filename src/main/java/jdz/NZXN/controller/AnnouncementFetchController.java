@@ -27,14 +27,10 @@ import jdz.NZXN.entity.device.DeviceRepository;
 @RestController
 @RequestMapping("/announcements")
 public class AnnouncementFetchController {
-	@Autowired
-	private AnnouncementRepository announcementRepo;
-	@Autowired
-	private AccountConfigRepository configRepo;
-	@Autowired
-	private DeviceRepository deviceRepo;
-	@Autowired
-	private CompanyRepository companyRepo;
+	@Autowired private AnnouncementRepository announcementRepo;
+	@Autowired private AccountConfigRepository configRepo;
+	@Autowired private DeviceRepository deviceRepo;
+	@Autowired private CompanyRepository companyRepo;
 
 	private Device getDevice(@AuthenticationPrincipal Principal principal) {
 		Device device = deviceRepo.findByDeviceID(UUID.fromString(principal.getName()));
