@@ -68,8 +68,9 @@ public class AnnouncementFetchController {
 		announcements.removeIf((a) -> {
 			if (cBlacklist.contains(a.getCompany()) || tBlacklist.contains(a.getType()))
 				return true;
+			String title = a.getTitle().toLowerCase();
 			for (String keyword : kwBlacklist)
-				if (a.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+				if (title.contains(keyword.toLowerCase()))
 					return true;
 			return false;
 		});
@@ -116,7 +117,7 @@ public class AnnouncementFetchController {
 				user.setLastFetchedAnnouncement(topId);
 				deviceRepo.save(user);
 			}
-			
+
 			for (int i = 0; i < 5; i++) {
 				List<Announcement> more = announcementRepo.findByIdBetweenOrderByIdDesc(endId, endId - range);
 				announcements.addAll(more);
