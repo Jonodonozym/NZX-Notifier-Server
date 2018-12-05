@@ -40,12 +40,12 @@ public class AnnouncementFetchController {
 	}
 
 	@GetMapping("/new")
-	public Collection<Announcement> newAnnouncementsFiltered(@AuthenticationPrincipal Principal principal) {
+	public Collection<Announcement> newAnnouncements(@AuthenticationPrincipal Principal principal) {
 		Device device = getDevice(principal);
 		Long lastAnnouncement = device.getLastFetchedAnnouncement();
-		
+
 		List<Announcement> announcements = announcementRepo.findByIdGreaterThanOrderByIdDesc(lastAnnouncement);
-		
+
 		if (!announcements.isEmpty()) {
 			device.setLastFetchedAnnouncement(announcements.get(0).getId());
 			deviceRepo.save(device);
@@ -57,24 +57,22 @@ public class AnnouncementFetchController {
 		return announcements;
 	}
 
-	@GetMapping("/recent")
-	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
-			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
-		Device user = getDevice(principal);
-		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
+	private void filter(Collection<Announcement> announcements, AccountConfig config) {
+		if (announcements.isEmpty())
+			return;
 
-		long topId = announcementRepo.findFirstByOrderByIdDesc().getId() - offset;
-		long endId = topId - (int) (100 * estimateFilterRatio(config));
+		Set<Company> cBlacklist = config.getCompanyBlacklist();
+		Set<String> kwBlacklist = config.getKeywordBlacklist();
+		Set<AnnouncementType> tBlacklist = config.getTypeBlacklist();
 
-		List<Announcement> announcements = announcementRepo.findByIdBetweenOrderByIdDesc(endId, topId);
-
-		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
-			user.setLastFetchedAnnouncement(topId);
-			deviceRepo.save(user);
-		}
-
-		filter(announcements, config);
-		return announcements;
+		announcements.removeIf((a) -> {
+			if (cBlacklist.contains(a.getCompany()) || tBlacklist.contains(a.getType()))
+				return true;
+			for (String keyword : kwBlacklist)
+				if (a.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+					return true;
+			return false;
+		});
 	}
 
 	@GetMapping("/search")
@@ -100,28 +98,44 @@ public class AnnouncementFetchController {
 		return announcementRepo.findFirst50ByTitleContainingOrderByIdDesc(query);
 	}
 
-	private void filter(Collection<Announcement> announcements, AccountConfig config) {
-		if (announcements.isEmpty())
-			return;
+	@GetMapping("/recent")
+	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
+			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
+		Device user = getDevice(principal);
+		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
 
-		Set<Company> cBlacklist = config.getCompanyBlacklist();
-		Set<String> kwBlacklist = config.getKeywordBlacklist();
-		Set<AnnouncementType> tBlacklist = config.getTypeBlacklist();
+		long topId = announcementRepo.findFirstByOrderByIdDesc().getId() - offset;
+		int range = (int) (100 / estimateFilterRatio(config));
 
-		announcements.removeIf((a) -> {
-			if (cBlacklist.contains(a.getCompany()) || tBlacklist.contains(a.getType()))
-				return true;
-			for (String keyword : kwBlacklist)
-				if (a.getTitle().toLowerCase().contains(keyword.toLowerCase()))
-					return true;
-			return false;
-		});
+		long endId = topId - range;
+
+		List<Announcement> announcements = announcementRepo.findByIdBetweenOrderByIdDesc(endId, topId);
+
+		if (!announcements.isEmpty()) {
+			if (user.getLastFetchedAnnouncement() < topId) {
+				user.setLastFetchedAnnouncement(topId);
+				deviceRepo.save(user);
+			}
+			
+			for (int i = 0; i < 5; i++) {
+				List<Announcement> more = announcementRepo.findByIdBetweenOrderByIdDesc(endId, endId - range);
+				announcements.addAll(more);
+
+				if (announcements.size() >= 100)
+					break;
+
+				endId -= range;
+			}
+		}
+
+		filter(announcements, config);
+		return announcements;
 	}
 
 	private double estimateFilterRatio(AccountConfig config) {
 		if (config.getTypeBlacklist().size() >= AnnouncementType.values().length)
 			return 0;
 
-		return 1 / (1.0 - config.getTypeBlacklist().size() / AnnouncementType.values().length);
+		return 1.0 - config.getTypeBlacklist().size() / AnnouncementType.values().length;
 	}
 }
