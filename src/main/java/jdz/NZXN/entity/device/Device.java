@@ -10,25 +10,23 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
+@Data
 @Table(name = "devices", indexes = @Index(columnList = "accountID"))
 @Entity
 @EqualsAndHashCode(of = { "deviceID" })
-@ToString
+@NoArgsConstructor
 public class Device {
-	@Type(type = "uuid-char") @Setter @Getter private UUID accountID;
+	@Type(type = "uuid-char") private UUID accountID;
 
-	@Id @Type(type = "uuid-char") @Getter private UUID deviceID;
+	@Id @Type(type = "uuid-char") private UUID deviceID;
 
-	@Getter @Setter private String name;
+	private String name;
 
-	@Getter @Setter private Long lastFetchedAnnouncement = 0L;
-
-	protected Device() {}
+	private Long lastFetchedAnnouncement = 0L;
 
 	public Device(UUID accountId, UUID deviceID, String name) {
 		accountID = accountId;

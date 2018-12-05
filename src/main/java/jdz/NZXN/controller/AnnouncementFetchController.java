@@ -41,15 +41,18 @@ public class AnnouncementFetchController {
 
 	@GetMapping("/new")
 	public Collection<Announcement> newAnnouncementsFiltered(@AuthenticationPrincipal Principal principal) {
-		Device user = getDevice(principal);
-		Long lastAnnouncement = user.getLastFetchedAnnouncement();
+		Device device = getDevice(principal);
+		Long lastAnnouncement = device.getLastFetchedAnnouncement();
+		
 		List<Announcement> announcements = announcementRepo.findByIdGreaterThanOrderByIdDesc(lastAnnouncement);
+		
 		if (!announcements.isEmpty()) {
-			user.setLastFetchedAnnouncement(announcements.get(0).getId());
-			deviceRepo.save(user);
-		}
+			device.setLastFetchedAnnouncement(announcements.get(0).getId());
+			deviceRepo.save(device);
 
-		filter(principal, announcements);
+			AccountConfig config = configRepo.findByAccountID(device.getAccountID());
+			filter(announcements, config);
+		}
 
 		return announcements;
 	}
@@ -57,25 +60,28 @@ public class AnnouncementFetchController {
 	@GetMapping("/recent")
 	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
 			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
+		Device user = getDevice(principal);
+		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
+
 		long topId = announcementRepo.findFirstByOrderByIdDesc().getId() - offset;
-		long endId = topId - 100;
+		long endId = topId - (int) (100 * estimateFilterRatio(config));
 
 		List<Announcement> announcements = announcementRepo.findByIdBetweenOrderByIdDesc(endId, topId);
 
-		Device user = getDevice(principal);
 		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
 			user.setLastFetchedAnnouncement(topId);
 			deviceRepo.save(user);
 		}
 
-		filter(principal, announcements);
+		filter(announcements, config);
 		return announcements;
 	}
 
 	@GetMapping("/search")
 	public Collection<Announcement> search(@AuthenticationPrincipal Principal principal, @RequestParam String query) {
+		AccountConfig config = configRepo.findByAccountID(UUID.fromString(principal.getName()));
 		List<Announcement> announcements = search(query);
-		filter(principal, announcements);
+		filter(announcements, config);
 		return announcements;
 	}
 
@@ -94,12 +100,9 @@ public class AnnouncementFetchController {
 		return announcementRepo.findFirst50ByTitleContainingOrderByIdDesc(query);
 	}
 
-	private void filter(Principal principal, Collection<Announcement> announcements) {
+	private void filter(Collection<Announcement> announcements, AccountConfig config) {
 		if (announcements.isEmpty())
 			return;
-
-		Device user = getDevice(principal);
-		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
 
 		Set<Company> cBlacklist = config.getCompanyBlacklist();
 		Set<String> kwBlacklist = config.getKeywordBlacklist();
@@ -113,5 +116,12 @@ public class AnnouncementFetchController {
 					return true;
 			return false;
 		});
+	}
+
+	private double estimateFilterRatio(AccountConfig config) {
+		if (config.getTypeBlacklist().size() >= AnnouncementType.values().length)
+			return 0;
+
+		return 1 / (1.0 - config.getTypeBlacklist().size() / AnnouncementType.values().length);
 	}
 }
