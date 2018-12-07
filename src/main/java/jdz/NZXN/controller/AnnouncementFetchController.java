@@ -101,13 +101,13 @@ public class AnnouncementFetchController {
 
 	@GetMapping("/recent")
 	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
-			@RequestParam(value = "offset", defaultValue = "0", required = false) long offset) {
+			@RequestParam(value = "startID", defaultValue = "-1", required = false) long startID) {
 		Device user = getDevice(principal);
 		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
 
-		long topId = announcementRepo.findFirstByOrderByIdDesc().getId() - offset;
 		int range = (int) (100 / estimateFilterRatio(config));
-
+		
+		long topId = startID == -1 ? announcementRepo.findFirstByOrderByIdDesc().getId() : startID;
 		long endId = topId - range;
 
 		List<Announcement> announcements = announcementRepo.findByIdBetweenOrderByIdDesc(endId, topId);
