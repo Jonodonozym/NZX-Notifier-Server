@@ -112,21 +112,9 @@ public class AnnouncementFetchController {
 
 		List<Announcement> announcements = announcementRepo.findByIdBetweenOrderByIdDesc(endId, topId);
 
-		if (!announcements.isEmpty()) {
-			if (user.getLastFetchedAnnouncement() < topId) {
-				user.setLastFetchedAnnouncement(topId);
-				deviceRepo.save(user);
-			}
-
-			for (int i = 0; i < 5; i++) {
-				List<Announcement> more = announcementRepo.findByIdBetweenOrderByIdDesc(endId, endId - range);
-				announcements.addAll(more);
-
-				if (announcements.size() >= 100)
-					break;
-
-				endId -= range;
-			}
+		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
+			user.setLastFetchedAnnouncement(topId);
+			deviceRepo.save(user);
 		}
 
 		filter(announcements, config);
