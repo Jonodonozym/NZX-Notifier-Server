@@ -12,13 +12,11 @@ import org.hibernate.annotations.Type;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
 @Table(name = "devices", indexes = @Index(columnList = "accountID"))
 @Entity
 @EqualsAndHashCode(of = { "deviceID" })
-@NoArgsConstructor
 public class Device {
 	@Type(type = "uuid-char") private UUID accountID;
 
