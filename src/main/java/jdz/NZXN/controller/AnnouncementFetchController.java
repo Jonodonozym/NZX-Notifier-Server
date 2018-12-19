@@ -101,7 +101,8 @@ public class AnnouncementFetchController {
 
 	@GetMapping("/recent")
 	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
-			@RequestParam(value = "startID", defaultValue = "-1", required = false) long startID) {
+			@RequestParam(defaultValue = "-1") long startID) {
+		System.out.println(startID);
 		Device user = getDevice(principal);
 		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
 
