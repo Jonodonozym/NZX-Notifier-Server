@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,6 +33,10 @@ public class NZXAnnouncementDataFetcher {
 	private static final String NZXannouncementsURL = "https://nzx.com/markets/NZSX/announcements";
 	private static final String announcementsTable = "table.table-to-list.announcements-table";
 	private static DateFormat NZXTimeFormat = new SimpleDateFormat("d/M/yyyy, h:mm a");
+	
+	static {
+		TimeZone.setDefault(TimeZone.getTimeZone("NZ"));
+	}
 
 	private final Logger log = LoggerFactory.getLogger(NZXAnnouncementDataFetcher.class);
 
