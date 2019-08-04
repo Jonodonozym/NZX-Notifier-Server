@@ -6,3 +6,5 @@
 >>>>>>> branch 'master' of https://github.com/Jonodonozym/NZX-Notifier.git
 /.gradle/
 /target/
+/.mvn/
+/.settings/
