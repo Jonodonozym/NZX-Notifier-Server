@@ -1,52 +1,26 @@
 
-package jdz.NZXN.NZXDataFetchers;
+package jdz.NZXN.dataFetch.nzx;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import jdz.NZXN.dataFetch.CompanyFetcher;
 import jdz.NZXN.entity.company.Company;
-import jdz.NZXN.entity.company.CompanyRepository;
 
 @Component
-public class NZXCompanyDataFetcher {
+public class NZXCompanyFetcher implements CompanyFetcher {
 	private static final String NZXrootURL = "https://nzx.com";
 	private static final String companiesListURL = "https://www.nzx.com/markets/NZSX";
 	private static final String companiesTable = "table.instruments-table";
 
-	private final Logger log = LoggerFactory.getLogger(NZXCompanyDataFetcher.class);
-
-	@Autowired private CompanyRepository repository;
-
-	@Scheduled(cron = "0 30 9 * * MON")
-	public void update() {
-		Set<Company> repoCompanies = new HashSet<>(repository.findAll());
-
-		List<Company> nzxCompanies = fetchAll();
-		nzxCompanies.removeIf((c) -> {
-			return repoCompanies.contains(c);
-		});
-
-		for (Company company : nzxCompanies)
-			repository.save(company);
-
-		if (!nzxCompanies.isEmpty())
-			log.info("Fetched " + nzxCompanies.size() + " new compan" + (nzxCompanies.size() > 1 ? "ies" : "y"));
-	}
-
-	private List<Company> fetchAll() {
+	public List<Company> fetchAll() {
 		List<Company> companies = new ArrayList<>();
 		Document doc;
 		try {
@@ -56,7 +30,7 @@ public class NZXCompanyDataFetcher {
 			return companies;
 		}
 
-		Element table = doc.select(companiesTable).select("tbody").get(0);
+		Element table = doc.selectFirst(companiesTable).selectFirst("tbody");
 
 		for (Element row : table.select("tr")) {
 			Elements tableRowElements = row.select("td");
@@ -64,9 +38,7 @@ public class NZXCompanyDataFetcher {
 			if (tableRowElements.isEmpty())
 				continue;
 
-			Company company = parseCompany(tableRowElements);
-			if (company != null)
-				companies.add(company);
+			companies.add(parseCompany(tableRowElements));
 		}
 
 		companies.add(new Company("NZXR", "NZX Regulations", "https://www.nzx.com/regulation/NZXR/announcements"));
