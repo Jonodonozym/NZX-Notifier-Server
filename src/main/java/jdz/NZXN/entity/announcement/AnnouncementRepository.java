@@ -1,27 +1,27 @@
 
 package jdz.NZXN.entity.announcement;
 
+import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import jdz.NZXN.entity.announcement.Announcement.AnnouncementID;
 import jdz.NZXN.entity.company.Company;
 
-public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
-	public Announcement findFirstByOrderByIdDesc();
+public interface AnnouncementRepository extends JpaRepository<Announcement, AnnouncementID> {
+	@Query("SELECT a FROM Announcement ORDER BY a.id.time DESC")
+	public Page<Announcement> getLatest(Pageable pageable);
+	
+	@Query("select a from Announcement a where a.id.time > ?1 ORDER BY a.id.time DESC")
+	public List<Announcement> getAllAfter(Calendar time);
 
-	public Optional<Announcement> findById(long id);
+	public List<Announcement> findFirst50ByAnnouncementIDCompanyOrderByAnnouncementIDTimeDesc(Company company);
+	public List<Announcement> findFirst50ByTypeOrderByAnnouncementIDTimeDesc(AnnouncementType type);
+	public List<Announcement> findFirst50ByAnnouncementIDTitleContainingOrderByAnnouncementIDTimeDesc(String query);
 
-	public List<Announcement> findByIdGreaterThanOrderByIdDesc(Long id);
-
-	public List<Announcement> findByIdBetweenOrderByIdDesc(long idStart, long idEnd);
-
-	public List<Announcement> findFirst50ByCompanyOrderByIdDesc(Company company);
-
-	public List<Announcement> findFirst50ByTypeOrderByIdDesc(AnnouncementType type);
-
-	public List<Announcement> findFirst50ByTitleContainingOrderByIdDesc(String query);
-
-	public Announcement findTopByOrderByTimeDesc();
+	public Announcement findTopByOrderByAnnouncementIDTimeDesc();
 }

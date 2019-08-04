@@ -19,12 +19,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = { "deviceID" })
 public class Device {
 	@Type(type = "uuid-char") private UUID accountID;
-
 	@Id @Type(type = "uuid-char") private UUID deviceID;
-
 	private String name;
-
-	private Long lastFetchedAnnouncement = 0L;
 
 	public Device(UUID accountId, UUID deviceID, String name) {
 		accountID = accountId;

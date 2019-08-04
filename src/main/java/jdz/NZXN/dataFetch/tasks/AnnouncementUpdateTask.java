@@ -24,7 +24,7 @@ public class AnnouncementUpdateTask {
 
 	@Scheduled(fixedRate = 60000, initialDelay = 5000)
 	public void update() throws IOException {
-		Announcement lastAnnouncement = repository.findTopByOrderByTimeDesc();
+		Announcement lastAnnouncement = repository.findTopByOrderByAnnouncementIDTimeDesc();
 		Calendar lastAnnouncementTime = lastAnnouncement == null ? Calendar.getInstance() : lastAnnouncement.getTime();
 		if (lastAnnouncement == null)
 			lastAnnouncementTime.set(1990, 0, 0);

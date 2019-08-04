@@ -2,12 +2,15 @@
 package jdz.NZXN.controller;
 
 import java.security.Principal;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,29 +35,34 @@ public class AnnouncementFetchController {
 	@Autowired private DeviceRepository deviceRepo;
 	@Autowired private CompanyRepository companyRepo;
 
-	private Device getDevice(@AuthenticationPrincipal Principal principal) {
+	private UUID getAccountID(Principal principal) {
+		return getDevice(principal).getAccountID();
+	}
+
+	private Device getDevice(Principal principal) {
 		Device device = deviceRepo.findByDeviceID(UUID.fromString(principal.getName()));
 		if (device == null)
 			throw new NullPointerException("No device exists with the ID " + principal.getName());
 		return device;
 	}
 
-	@GetMapping("/new")
-	public Collection<Announcement> newAnnouncements(@AuthenticationPrincipal Principal principal) {
-		Device device = getDevice(principal);
-		Long lastAnnouncement = device.getLastFetchedAnnouncement();
-
-		List<Announcement> announcements = announcementRepo.findByIdGreaterThanOrderByIdDesc(lastAnnouncement);
-
-		if (!announcements.isEmpty()) {
-			device.setLastFetchedAnnouncement(announcements.get(0).getId());
-			deviceRepo.save(device);
-
-			AccountConfig config = configRepo.findByAccountID(device.getAccountID());
-			filter(announcements, config);
-		}
-
+	@GetMapping("/page")
+	public Collection<Announcement> getPage(@AuthenticationPrincipal Principal principal, @RequestParam() int page) {
+		AccountConfig config = configRepo.findByAccountID(getAccountID(principal));
+		List<Announcement> announcements = announcementRepo.getLatest(getPage(config, page)).getContent();
+		filter(announcements, config);
 		return announcements;
+	}
+
+	private Pageable getPage(AccountConfig config, int page) {
+		int announcementsQuerySize = (int) (100 / estimateFilterRatio(config));
+		return PageRequest.of(0, announcementsQuerySize);
+	}
+
+	private double estimateFilterRatio(AccountConfig config) {
+		if (config.getTypeBlacklist().size() >= AnnouncementType.values().length)
+			return 0;
+		return 1.0 - config.getTypeBlacklist().size() / AnnouncementType.values().length;
 	}
 
 	private void filter(Collection<Announcement> announcements, AccountConfig config) {
@@ -76,6 +84,22 @@ public class AnnouncementFetchController {
 		});
 	}
 
+	@GetMapping("/new")
+	public Collection<Announcement> newAnnouncements(@AuthenticationPrincipal Principal principal,
+			long latestAnnouncementTime) {
+		AccountConfig config = configRepo.findByAccountID(getAccountID(principal));
+
+		Calendar latestTime = Calendar.getInstance();
+		latestTime.setTimeInMillis(latestAnnouncementTime);
+		List<Announcement> announcements = announcementRepo.getAllAfter(latestTime);
+
+		if (announcements.isEmpty())
+			return announcements;
+		filter(announcements, config);
+
+		return announcements;
+	}
+
 	@GetMapping("/search")
 	public Collection<Announcement> search(@AuthenticationPrincipal Principal principal, @RequestParam String query) {
 		AccountConfig config = configRepo.findByAccountID(UUID.fromString(principal.getName()));
@@ -87,44 +111,15 @@ public class AnnouncementFetchController {
 	private List<Announcement> search(String query) {
 		List<Company> companies = companyRepo.findByIdStartingWith(query);
 		if (companies.size() == 1)
-			return announcementRepo.findFirst50ByCompanyOrderByIdDesc(companies.get(0));
+			return announcementRepo.findFirst50ByAnnouncementIDCompanyOrderByAnnouncementIDTimeDesc(companies.get(0));
 
 		try {
 			AnnouncementType type = AnnouncementType.of(query);
 			if (type != null)
-				return announcementRepo.findFirst50ByTypeOrderByIdDesc(type);
+				return announcementRepo.findFirst50ByTypeOrderByAnnouncementIDTimeDesc(type);
 		}
 		catch (Exception e) {}
 
-		return announcementRepo.findFirst50ByTitleContainingOrderByIdDesc(query);
-	}
-
-	@GetMapping("/recent")
-	public Collection<Announcement> recentAnnouncementsFiltered(@AuthenticationPrincipal Principal principal,
-			@RequestParam(defaultValue = "-1") long startID) {
-		Device user = getDevice(principal);
-		AccountConfig config = configRepo.findByAccountID(user.getAccountID());
-
-		int range = (int) (100 / estimateFilterRatio(config));
-
-		long topId = startID == -1 ? announcementRepo.findFirstByOrderByIdDesc().getId() : startID;
-		long endId = topId - range;
-
-		List<Announcement> announcements = announcementRepo.findByIdBetweenOrderByIdDesc(endId, topId);
-
-		if (!announcements.isEmpty() && user.getLastFetchedAnnouncement() < topId) {
-			user.setLastFetchedAnnouncement(topId);
-			deviceRepo.save(user);
-		}
-
-		filter(announcements, config);
-		return announcements;
-	}
-
-	private double estimateFilterRatio(AccountConfig config) {
-		if (config.getTypeBlacklist().size() >= AnnouncementType.values().length)
-			return 0;
-
-		return 1.0 - config.getTypeBlacklist().size() / AnnouncementType.values().length;
+		return announcementRepo.findFirst50ByAnnouncementIDTitleContainingOrderByAnnouncementIDTimeDesc(query);
 	}
 }
