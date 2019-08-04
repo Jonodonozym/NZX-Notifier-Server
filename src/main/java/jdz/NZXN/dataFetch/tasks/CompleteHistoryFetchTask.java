@@ -2,6 +2,8 @@
 package jdz.NZXN.dataFetch.tasks;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,15 @@ public class CompleteHistoryFetchTask {
 
 	public void update() throws IOException {
 		companyUpdater.update();
+		ExecutorService executor = Executors.newFixedThreadPool((int) companyRepository.count());
 		for (Company company : companyRepository.findAll())
-			announcementRepository.saveAll(announcementFetcher.fetchAll(company));
+			executor.execute(() -> {
+				try {
+					announcementRepository.saveAll(announcementFetcher.fetchAll(company));
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
 	}
 }
