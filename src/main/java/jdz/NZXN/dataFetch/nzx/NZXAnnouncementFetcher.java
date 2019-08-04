@@ -38,18 +38,20 @@ public class NZXAnnouncementFetcher implements AnnouncementFetcher {
 		Document doc = Jsoup.connect(NZXannouncementsURL).get();
 		Element table = doc.selectFirst(announcementsTable);
 
-		List<Announcement> announcements = parseAnnouncementTable(table);
-		announcements.removeIf((announcement) -> announcement.getTime().compareTo(time) <= 0);
+		List<Announcement> announcements = parseAnnouncementTable(table, time.getTimeInMillis());
 
 		Collections.reverse(announcements);
 		return announcements;
 	}
 
-	private List<Announcement> parseAnnouncementTable(Element table) {
+	private List<Announcement> parseAnnouncementTable(Element table, long maxTime) {
 		List<Announcement> announcements = new ArrayList<>();
 		for (Element row : table.selectFirst("tbody").select("tr")) {
 			try {
-				announcements.add(parseAnnouncement(row));
+				Announcement announcement = parseAnnouncement(row);
+				if (announcement.getTime().getTimeInMillis() < maxTime)
+					break;
+				announcements.add(announcement);
 			}
 			catch (IOException | ParseException e) {
 				e.printStackTrace();
@@ -106,7 +108,7 @@ public class NZXAnnouncementFetcher implements AnnouncementFetcher {
 			Document doc = Jsoup
 					.connect("https://www.nzx.com/companies/" + company.getId() + "/announcements?year=" + year).get();
 			Element table = doc.selectFirst("table[class='table-to-list announcements-table'");
-			announcements.addAll(parseAnnouncementTable(table));
+			announcements.addAll(parseAnnouncementTable(table, 0));
 		}
 		return announcements;
 	}
