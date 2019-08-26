@@ -49,7 +49,7 @@ public class NZXAnnouncementFetcher implements AnnouncementFetcher {
 		for (Element row : table.selectFirst("tbody").select("tr")) {
 			try {
 				Announcement announcement = parseAnnouncement(row);
-				if (announcement.getTime().getTimeInMillis() < maxTime)
+				if (announcement.getTime().getTimeInMillis() <= maxTime)
 					break;
 				announcements.add(announcement);
 			}
