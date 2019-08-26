@@ -13,7 +13,7 @@ import jdz.NZXN.entity.announcement.Announcement.AnnouncementID;
 import jdz.NZXN.entity.company.Company;
 
 public interface AnnouncementRepository extends JpaRepository<Announcement, AnnouncementID> {
-	@Query("SELECT a FROM Announcement ORDER BY a.id.time DESC")
+	@Query("SELECT a FROM Announcement a ORDER BY a.id.time DESC")
 	public Page<Announcement> getLatest(Pageable pageable);
 	
 	@Query("select a from Announcement a where a.id.time > ?1 ORDER BY a.id.time DESC")
