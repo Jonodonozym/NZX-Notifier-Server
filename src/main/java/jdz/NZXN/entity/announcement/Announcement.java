@@ -25,9 +25,7 @@ import lombok.ToString;
 @Entity
 @EqualsAndHashCode(of = { "id" })
 @ToString
-@Table(indexes = { @Index(name = "index_time", columnList = "id.time", unique = false),
-		@Index(name = "index_company", columnList = "id.companyId", unique = false),
-		@Index(name = "index_type", columnList = "type", unique = false) })
+@Table(indexes = { @Index(name = "index_type", columnList = "type", unique = false) })
 public class Announcement {
 	@Embeddable
 	@AllArgsConstructor
