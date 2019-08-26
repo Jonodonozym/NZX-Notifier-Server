@@ -1,14 +1,12 @@
 
 package jdz.NZXN.controller;
 
-import java.security.Principal;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,8 +30,7 @@ public class AnnouncementFetchController {
 	}
 
 	@GetMapping("/new")
-	public Collection<Announcement> newAnnouncements(@AuthenticationPrincipal Principal principal,
-			@RequestParam long latestAnnouncementTime) {
+	public Collection<Announcement> newAnnouncements(@RequestParam long latestAnnouncementTime) {
 		Calendar latestTime = Calendar.getInstance();
 		latestTime.setTimeInMillis(latestAnnouncementTime);
 		List<Announcement> announcements = announcementRepo.getAllAfter(latestTime);
@@ -45,12 +42,12 @@ public class AnnouncementFetchController {
 	}
 
 	@GetMapping("/search")
-	public Collection<Announcement> search(@AuthenticationPrincipal Principal principal, @RequestParam String query) {
-		List<Announcement> announcements = search(query);
+	public Collection<Announcement> search(@RequestParam String query) {
+		List<Announcement> announcements = searchRepos(query);
 		return announcements;
 	}
 
-	private List<Announcement> search(String query) {
+	private List<Announcement> searchRepos(String query) {
 		List<Company> companies = companyRepo.findByIdStartingWith(query);
 		if (companies.size() == 1)
 			return announcementRepo.findFirst50ByIdCompanyOrderByIdTimeDesc(companies.get(0));
