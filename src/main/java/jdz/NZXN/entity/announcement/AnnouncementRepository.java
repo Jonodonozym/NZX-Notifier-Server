@@ -19,9 +19,9 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Anno
 	@Query("select a from Announcement a where a.id.time > ?1 ORDER BY a.id.time DESC")
 	public List<Announcement> getAllAfter(Calendar time);
 
-	public List<Announcement> findFirst50ByAnnouncementIDCompanyOrderByAnnouncementIDTimeDesc(Company company);
-	public List<Announcement> findFirst50ByTypeOrderByAnnouncementIDTimeDesc(AnnouncementType type);
-	public List<Announcement> findFirst50ByAnnouncementIDTitleContainingOrderByAnnouncementIDTimeDesc(String query);
+	public List<Announcement> findFirst50ByIdCompanyOrderByIdTimeDesc(Company company);
+	public List<Announcement> findFirst50ByTypeOrderByIdTimeDesc(AnnouncementType type);
+	public List<Announcement> findFirst50ByIdTitleContainingOrderByIdTimeDesc(String query);
 
-	public Announcement findTopByOrderByAnnouncementIDTimeDesc();
+	public Announcement findTopByOrderByIdTimeDesc();
 }

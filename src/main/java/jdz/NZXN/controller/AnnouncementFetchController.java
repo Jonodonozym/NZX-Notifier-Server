@@ -53,15 +53,15 @@ public class AnnouncementFetchController {
 	private List<Announcement> search(String query) {
 		List<Company> companies = companyRepo.findByIdStartingWith(query);
 		if (companies.size() == 1)
-			return announcementRepo.findFirst50ByAnnouncementIDCompanyOrderByAnnouncementIDTimeDesc(companies.get(0));
+			return announcementRepo.findFirst50ByIdCompanyOrderByIdTimeDesc(companies.get(0));
 
 		try {
 			AnnouncementType type = AnnouncementType.of(query);
 			if (type != null)
-				return announcementRepo.findFirst50ByTypeOrderByAnnouncementIDTimeDesc(type);
+				return announcementRepo.findFirst50ByTypeOrderByIdTimeDesc(type);
 		}
 		catch (Exception e) {}
 
-		return announcementRepo.findFirst50ByAnnouncementIDTitleContainingOrderByAnnouncementIDTimeDesc(query);
+		return announcementRepo.findFirst50ByIdTitleContainingOrderByIdTimeDesc(query);
 	}
 }
